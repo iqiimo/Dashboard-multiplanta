@@ -941,30 +941,30 @@ function renderCompDevol({ devActual, rawDevoluciones, filterPlanta, mes, anio, 
           const good = m.inv ? pct<=0 : pct>=0;
           return { txt:(pct>=0?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%', cls: good?'pos':'neg' };
         })();
-        return \`<div class="comp-row">
-          <span class="comp-metric">\${m.label}</span>
+        return `<div class="comp-row">
+          <span class="comp-metric">${m.label}</span>
           <div class="comp-vals">
-            <span class="comp-now">\${typeof now==='number'?now.toLocaleString('es-MX'):now}</span>
-            <span class="comp-prev">vs \${typeof prev==='number'?prev.toLocaleString('es-MX'):prev}</span>
-            <span class="delta \${d.cls}">\${d.txt}</span>
+            <span class="comp-now">${typeof now==='number'?now.toLocaleString('es-MX'):now}</span>
+            <span class="comp-prev">vs ${typeof prev==='number'?prev.toLocaleString('es-MX'):prev}</span>
+            <span class="delta ${d.cls}">${d.txt}</span>
           </div>
-        </div>\`;
+        </div>`;
       }).join('')}
     </div>`;
 
   document.getElementById('compDevol').innerHTML =
-    block(\`📅 vs \${['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][mesPrevNum]} \${anioPrev} (mismo corte)\`, dMesPrev,  'border-color:rgba(230,168,23,0.25);') +
-    block(\`📆 vs \${['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][mes]} \${anioAntNum} (mismo corte)\`,   dAnioPrev, 'border-color:rgba(0,153,204,0.25);') +
-    \`<div class="comp-card" style="border-color:rgba(214,48,49,0.2);">
+    block(`📅 vs ${['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][mesPrevNum]} ${anioPrev} (mismo corte)`, dMesPrev,  'border-color:rgba(230,168,23,0.25);') +
+    block(`📆 vs ${['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][mes]} ${anioAntNum} (mismo corte)`,   dAnioPrev, 'border-color:rgba(0,153,204,0.25);') +
+    `<div class="comp-card" style="border-color:rgba(214,48,49,0.2);">
       <div class="comp-title">🔍 Top responsable del período</div>
-      \${(()=>{
+      ${(()=>{
         const by={};
         devActual.forEach(r=>{by[r.responsable]=(by[r.responsable]||0)+1;});
         return Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>
-          \`<div class="comp-row"><span class="comp-metric">\${k}</span><div class="comp-vals"><span class="comp-now">\${v}</span><span class="comp-prev">devoluciones</span></div></div>\`
+          `<div class="comp-row"><span class="comp-metric">${k}</span><div class="comp-vals"><span class="comp-now">${v}</span><span class="comp-prev">devoluciones</span></div></div>`
         ).join('');
       })()}
-    </div>\`;
+    </div>`;
 }
 
 // ── TABLA DEVOLUCIONES ────────────────────────────────────────────────────────
