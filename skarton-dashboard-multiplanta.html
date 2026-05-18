@@ -88,15 +88,15 @@ main{padding:24px 28px;display:none;}
 
 /* COMPARATIVO ROW */
 .comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
-.comp-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
+.comp-card{background:var(--surface);border:1px solid var(--border);padding:20px;}
 .comp-title{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px;}
-.comp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(30,35,48,0.5);}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.07);}
 .comp-row:last-child{border-bottom:none;}
-.comp-metric{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);}
+.comp-metric{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);font-weight:600;}
 .comp-vals{display:flex;gap:12px;align-items:center;}
-.comp-now{font-family:var(--font-mono);font-size:11px;color:var(--text);}
-.comp-prev{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
-.delta{font-family:var(--font-mono);font-size:9px;padding:1px 5px;}
+.comp-now{font-family:var(--font-mono);font-size:13px;color:var(--text);font-weight:700;}
+.comp-prev{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
+.delta{font-family:var(--font-mono);font-size:11px;font-weight:700;padding:2px 6px;}
 .delta.pos{color:var(--accent);} .delta.neg{color:var(--danger);} .delta.neu{color:var(--text-muted);}
 
 /* CHARTS */
@@ -761,14 +761,14 @@ function renderKPIMerma({ dActual }) {
 
   document.getElementById('kpiMerma').innerHTML = `
     <div class="kpi-card ${pctTrim<=META_TRIM?'':'danger'}">
-      <div class="kpi-label">% Merma Trim (pagada)</div>
+      <div class="kpi-label">% Merma Trim</div>
       <div class="kpi-value">${fmt(pctTrim,2)}</div>
       <div class="kpi-unit">% sobre producción</div>
       <div class="progress-track"><div class="progress-fill ${pctTrim<=META_TRIM?'':'danger'}" style="width:${Math.min(pctTrim/META_TRIM*100,150)}%"></div></div>
       <div class="kpi-meta ${diffT>0?'down':'up'}">${diffT>0?'▲':'▼'} ${fmt(Math.abs(diffT),2)}% vs meta ${META_TRIM}%</div>
     </div>
     <div class="kpi-card ${pctProc<=META_PROC?'':'danger'}">
-      <div class="kpi-label">% Merma Proceso (no pagada)</div>
+      <div class="kpi-label">% Merma Proceso</div>
       <div class="kpi-value">${fmt(pctProc,2)}</div>
       <div class="kpi-unit">% sobre producción</div>
       <div class="progress-track"><div class="progress-fill ${pctProc<=META_PROC?'':'danger'}" style="width:${Math.min(pctProc/META_PROC*100,150)}%"></div></div>
@@ -817,8 +817,8 @@ function renderCompMerma({ dActual, dMesPrev, dAnioPrev, meta, mes, anio, mesPre
   document.getElementById('compMerma').innerHTML = `
     <div class="comp-card" style="border-color:rgba(0,102,204,0.25);">
       <div class="comp-title">📌 vs Metas Fijas</div>
-      ${row('% Trim (pagada)',    tNow, META_TRIM,  'meta 3.5%')}
-      ${row('% Proceso (no pag)',pNow, META_PROC,  'meta 10.5%')}
+      ${row('% Trim',    tNow, META_TRIM,  'meta 3.5%')}
+      ${row('% Proceso',pNow, META_PROC,  'meta 10.5%')}
     </div>
     <div class="comp-card" style="border-color:rgba(230,168,23,0.2);">
       <div class="comp-title">📅 vs ${MESES[mesPrevNum]} ${anioPrev} (mismo corte)</div>
