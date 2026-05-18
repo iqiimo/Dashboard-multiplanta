@@ -23,7 +23,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 #loading{position:fixed;inset:0;background:#111318;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px;}
 .loading-logo{font-family:var(--font-display);font-size:64px;letter-spacing:8px;color:var(--accent);}
 .loading-bar-track{width:320px;height:2px;background:#1e2330;overflow:hidden;}
-.loading-bar{height:100%;background:#0066cc;animation:loadbar 6s ease-in-out forwards;}
+.loading-bar{height:100%;background:#0066cc;animation:loadbar 2s ease-in-out forwards;}
 @keyframes loadbar{from{width:0}to{width:100%}}
 .loading-text{font-family:var(--font-mono);font-size:11px;color:#8892a4;letter-spacing:2px;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
@@ -130,7 +130,7 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
 <div class="app">
 
 <div id="loading">
-  <img src="" id="loadingLogo" style="height:80px;width:auto;object-fit:contain;max-width:320px;margin-bottom:10px;" alt="Globalty">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:8px;"><span style="color:#ffffff">GLOBAL</span><span style="color:#4d9fff">TY</span><sup style="font-size:18px;color:#4d9fff">®</sup></div>
   <div class="loading-bar-track"><div class="loading-bar"></div></div>
   <div class="loading-text">CARGANDO DATOS...</div>
 </div>
@@ -439,9 +439,6 @@ function parseMetas(table) {
 
 // ── LOAD ──────────────────────────────────────────────────────────────────────
 async function loadData() {
-  // Set loading logo
-  const loadingLogoEl = document.getElementById('loadingLogo');
-  if (loadingLogoEl) loadingLogoEl.src = LOGO_GLOBALTY;
   try {
     const planta = document.getElementById('filterPlanta').value;
     const metaSheet = `METAS_${planta.toUpperCase()}`;
@@ -458,16 +455,12 @@ async function loadData() {
     document.getElementById('filterAnio').value = anioActual;
     document.getElementById('filterMes').value  = mesActual;
 
-    if (!window._loaded) {
-      window._loaded = true;
-      await new Promise(r => setTimeout(r, 5000));
-    }
+    window._loaded = true;
     document.getElementById('loading').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('periodoBanner').style.display = 'flex';
     document.getElementById('lastUpdate').textContent = `ACTUALIZADO ${hoy.toLocaleTimeString('es-MX')}`;
     // Update header logo
-    const planta = document.getElementById('filterPlanta').value;
     const logoEl = document.getElementById('headerLogo');
     if (logoEl && LOGOS[planta]) logoEl.src = LOGOS[planta].src;
     document.getElementById('footerTs').textContent = `FETCH: ${hoy.toLocaleString('es-MX')}`;
@@ -1054,8 +1047,6 @@ function switchTab(name) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-// Show globalty logo on loading screen immediately
-document.getElementById('loadingLogo').src = LOGO_GLOBALTY;
 loadData();
 setInterval(loadData, 5*60*1000);
 </script>
