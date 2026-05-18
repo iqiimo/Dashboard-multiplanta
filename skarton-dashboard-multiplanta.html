@@ -70,15 +70,15 @@ main{padding:24px 28px;display:none;}
 
 /* KPI GRID */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:22px;}
-.kpi-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);padding:24px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
 .kpi-card:hover{border-color:var(--accent);transform:translateY(-2px);}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent);}
 .kpi-card.warn::before{background:var(--warn);}
 .kpi-card.danger::before{background:var(--danger);}
 .kpi-card.blue::before{background:var(--accent3);}
 .kpi-card.orange::before{background:var(--accent2);}
-.kpi-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;}
-.kpi-value{font-family:var(--font-display);font-size:38px;line-height:1;color:var(--text);}
+.kpi-label{font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;}
+.kpi-value{font-family:var(--font-display);font-size:48px;line-height:1;color:var(--text);}
 .kpi-unit{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:3px;}
 .kpi-meta{font-family:var(--font-mono);font-size:9px;margin-top:6px;}
 .up{color:var(--accent);} .down{color:var(--danger);} .neutral{color:var(--text-muted);}
@@ -89,7 +89,7 @@ main{padding:24px 28px;display:none;}
 /* COMPARATIVO ROW */
 .comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
 .comp-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
-.comp-title{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px;}
+.comp-title{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px;}
 .comp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(30,35,48,0.5);}
 .comp-row:last-child{border-bottom:none;}
 .comp-metric{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);}
@@ -573,9 +573,9 @@ function renderKPIs({ dActual, meta, corte }) {
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">m² Producidos</div>
-      <div class="kpi-value">${fmt(m2/1000,0)}</div>
-      <div class="kpi-unit">miles de m²</div>
-      <div class="kpi-meta neutral">${fmt(m2)} m² total</div>
+      <div class="kpi-value">${fmt(m2,0)}</div>
+      <div class="kpi-unit">m² producidos</div>
+      <div class="kpi-meta neutral">${fmt(m2/1000,1)}k m² total</div>
     </div>
     <div class="kpi-card ${diasProd/diasTot>=0.8?'':'warn'}">
       <div class="kpi-label">Días Productivos</div>
@@ -692,7 +692,7 @@ function renderChartAcum({ dActual, dMesPrev, dAnioPrev, mesPrevNum, anioPrev, a
   CHARTS.chartAcum = new Chart(document.getElementById('chartAcum'), {
     type:'line',
     data:{ labels, datasets:[
-      { label:`${MESES[mes]} ${anio}`,              data:aA, borderColor:'#00e5a0', backgroundColor:'rgba(0,229,160,0.1)',  borderWidth:2.5, pointRadius:3, tension:0.3, fill:true },
+      { label:`${MESES[mes]} ${anio}`,              data:aA, borderColor:'#00cc88', backgroundColor:'rgba(0,204,136,0.1)',  borderWidth:2.5, pointRadius:3, tension:0.3, fill:true },
       { label:`${MESES[mesPrevNum]} ${anioPrev}`,   data:aP, borderColor:'#ffd166', backgroundColor:'rgba(255,209,102,0.05)', borderWidth:1.5, pointRadius:2, tension:0.3, borderDash:[4,4] },
       { label:`${MESES[mes]} ${anioAntNum}`,        data:aY, borderColor:'#4d9fff', backgroundColor:'rgba(77,159,255,0.05)', borderWidth:1.5, pointRadius:2, tension:0.3, borderDash:[4,4] }
     ]},
@@ -708,7 +708,7 @@ function renderChartMeta({ dActual, meta }) {
   CHARTS.chartMeta = new Chart(document.getElementById('chartMeta'), {
     type:'doughnut',
     data:{ labels:['Embarcado','Pendiente'],
-      datasets:[{ data:[real, rest], backgroundColor:['#0066cc','#e8ecf4'], borderColor:['#0066cc','#d0d5e8'], borderWidth:2 }]
+      datasets:[{ data:[real, rest], backgroundColor:['#00cc88','#e8ecf4'], borderColor:['#00cc88','#e8ecf4'], borderWidth:1 }]
     },
     options:{ responsive:true, plugins:{
       legend:{labels:{color:'#8892a4',font:{family:'IBM Plex Mono',size:10}}},
@@ -725,7 +725,7 @@ function renderChartComparoDia({ dActual, dMesPrev, mes, anio, mesPrevNum, anioP
   CHARTS.chartComparoDia = new Chart(document.getElementById('chartComparoDia'), {
     type:'bar',
     data:{ labels: dias.map(d=>`D${d}`), datasets:[
-      { label:`${MESES[mes].substring(0,3)} ${anio}`,        data:dias.map(d=>getVal(dActual,d)),  backgroundColor:'rgba(0,229,160,0.7)',  borderColor:'#00e5a0',  borderWidth:1 },
+      { label:`${MESES[mes].substring(0,3)} ${anio}`,        data:dias.map(d=>getVal(dActual,d)),  backgroundColor:'rgba(0,204,136,0.8)',  borderColor:'#00cc88',  borderWidth:1 },
       { label:`${MESES[mesPrevNum].substring(0,3)} ${anioPrev}`, data:dias.map(d=>getVal(dMesPrev,d)), backgroundColor:'rgba(255,209,102,0.4)', borderColor:'#ffd166', borderWidth:1 }
     ]},
     options: chartBase('kg')
@@ -740,7 +740,7 @@ function renderChartDias({ dActual }) {
   CHARTS.chartDias = new Chart(document.getElementById('chartDias'), {
     type:'doughnut',
     data:{ labels:['Productivos','Paros/Domingos'],
-      datasets:[{ data:[prod,paro], backgroundColor:['#0066cc','#e8ecf4'], borderColor:['#0066cc','#d0d5e8'], borderWidth:2 }]
+      datasets:[{ data:[prod,paro], backgroundColor:['#00cc88','#e8ecf4'], borderColor:['#00cc88','#e8ecf4'], borderWidth:1 }]
     },
     options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#8892a4',font:{family:'IBM Plex Mono',size:10} } } } }
   });
@@ -752,7 +752,7 @@ function renderKPIMerma({ dActual, meta }) {
   const proc  = sum(dActual,'mermaProc');
   const total = trim + proc;
   const prod  = sum(dActual,'tonProd');
-  const pctM  = prod>0 ? total/(prod*10) : 0; // kg/kg → %
+  const pctM  = prod>0 ? (total/prod*100) : 0; // kg merma / kg prod * 100
   const metaM = (meta.metaMerma||META_MERMA)*100;
   const diff  = pctM - metaM;
   document.getElementById('kpiMerma').innerHTML = `
@@ -786,7 +786,7 @@ function renderKPIMerma({ dActual, meta }) {
 // ── COMP MERMA ────────────────────────────────────────────────────────────────
 function renderCompMerma({ dActual, dMesPrev, dAnioPrev, meta, mes, anio, mesPrevNum, anioPrev, anioAntNum }) {
   const mermaKg = arr => sum(arr,'mermaTrim')+sum(arr,'mermaProc');
-  const mermaPct= arr => { const p=sum(arr,'tonProd'); return p>0 ? mermaKg(arr)/(p*10) : 0; };
+  const mermaPct= arr => { const p=sum(arr,'tonProd'); return p>0 ? (mermaKg(arr)/p*100) : 0; };
 
   const now = mermaPct(dActual);
   const prev= mermaPct(dMesPrev);
@@ -851,7 +851,7 @@ function renderChartMermaPct({ dActual, meta }) {
   const labels=[], vals=[], metas=[];
   sorted.forEach(r => {
     acumMerma += (r.mermaTrim||0)+(r.mermaProc||0);
-    acumProd  += (r.tonProd||0)*10;
+    acumProd  += (r.tonProd||0);
     labels.push(`D${r.dia}`);
     vals.push(acumProd>0 ? acumMerma/acumProd*100 : 0);
     metas.push((meta.metaMerma||META_MERMA)*100);
@@ -889,7 +889,7 @@ function renderChartDevolDepto({ devActual }) {
   const colors = ['#ff4757','#ff6b35','#ffd166','#4d9fff','#00e5a0','#a855f7','#06b6d4','#f43f5e'];
   CHARTS.chartDevolDepto = new Chart(document.getElementById('chartDevolDepto'), {
     type:'doughnut',
-    data:{ labels:sorted.map(e=>e[0]), datasets:[{ data:sorted.map(e=>e[1]), backgroundColor:colors, borderColor:'#0a0c0f', borderWidth:3 }] },
+    data:{ labels:sorted.map(e=>e[0]), datasets:[{ data:sorted.map(e=>e[1]), backgroundColor:colors, borderColor:'#ffffff', borderWidth:2 }] },
     options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:9}, boxWidth:10, padding:8 } } } }
   });
 }
@@ -903,7 +903,7 @@ function renderChartDevolCliente({ devActual }) {
   CHARTS.chartDevolCliente = new Chart(document.getElementById('chartDevolCliente'), {
     type:'bar',
     data:{ labels:sorted.map(e=>e[0].length>18?e[0].substring(0,18)+'…':e[0]),
-      datasets:[{ label:'Piezas', data:sorted.map(e=>e[1]), backgroundColor:'rgba(255,71,87,0.7)', borderColor:'#ff4757', borderWidth:1 }]
+      datasets:[{ label:'Piezas', data:sorted.map(e=>e[1]), backgroundColor:'rgba(255,100,120,0.5)', borderColor:'rgba(255,100,120,0.7)', borderWidth:1 }]
     },
     options:{ indexAxis:'y', responsive:true,
       plugins:{ legend:{display:false} },
@@ -998,7 +998,7 @@ function renderTablaProduccion({ dActual }) {
   document.getElementById('tablaProduccion').innerHTML = rows.map((r,i)=>{
     const isParo = r.tonProd===0;
     const mermaTotal = (r.mermaTrim||0)+(r.mermaProc||0);
-    const pctM = r.tonProd>0 ? mermaTotal/(r.tonProd*10) : 0;
+    const pctM = r.tonProd>0 ? (mermaTotal/r.tonProd*100) : 0;
     const chip = pctM<=10.5?'chip-ok':pctM<=15?'chip-warn':'chip-bad';
     return `<tr>
       <td class="hl">${fmtD(r.fecha)}</td>
