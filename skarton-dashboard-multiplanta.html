@@ -747,58 +747,64 @@ function renderChartDias({ dActual }) {
 }
 
 // ── KPI MERMA ─────────────────────────────────────────────────────────────────
-function renderKPIMerma({ dActual, meta }) {
+const META_TRIM = 3.5;   // % fijo
+const META_PROC = 10.5;  // % fijo (puede cambiar)
+
+function renderKPIMerma({ dActual }) {
   const trim  = sum(dActual,'mermaTrim');
   const proc  = sum(dActual,'mermaProc');
-  const total = trim + proc;
   const prod  = sum(dActual,'tonProd');
-  const pctM  = prod>0 ? (total/prod*100) : 0; // kg merma / kg prod * 100
-  const metaM = (meta.metaMerma||META_MERMA)*100;
-  const diff  = pctM - metaM;
+  const pctTrim = prod>0 ? (trim/prod*100) : 0;
+  const pctProc = prod>0 ? (proc/prod*100) : 0;
+  const diffT   = pctTrim - META_TRIM;
+  const diffP   = pctProc - META_PROC;
+
   document.getElementById('kpiMerma').innerHTML = `
-    <div class="kpi-card ${pctM<=metaM?'':'danger'}">
-      <div class="kpi-label">% Merma Total</div>
-      <div class="kpi-value">${fmt(pctM,2)}</div>
+    <div class="kpi-card ${pctTrim<=META_TRIM?'':'danger'}">
+      <div class="kpi-label">% Merma Trim (pagada)</div>
+      <div class="kpi-value">${fmt(pctTrim,2)}</div>
       <div class="kpi-unit">% sobre producción</div>
-      <div class="progress-track"><div class="progress-fill ${pctM<=metaM?'':'danger'}" style="width:${Math.min(pctM/metaM*100,150)}%"></div></div>
-      <div class="kpi-meta ${diff>0?'down':'up'}">${diff>0?'▲':'▼'} ${fmt(Math.abs(diff),2)}% vs meta ${fmt(metaM,1)}%</div>
+      <div class="progress-track"><div class="progress-fill ${pctTrim<=META_TRIM?'':'danger'}" style="width:${Math.min(pctTrim/META_TRIM*100,150)}%"></div></div>
+      <div class="kpi-meta ${diffT>0?'down':'up'}">${diffT>0?'▲':'▼'} ${fmt(Math.abs(diffT),2)}% vs meta ${META_TRIM}%</div>
+    </div>
+    <div class="kpi-card ${pctProc<=META_PROC?'':'danger'}">
+      <div class="kpi-label">% Merma Proceso (no pagada)</div>
+      <div class="kpi-value">${fmt(pctProc,2)}</div>
+      <div class="kpi-unit">% sobre producción</div>
+      <div class="progress-track"><div class="progress-fill ${pctProc<=META_PROC?'':'danger'}" style="width:${Math.min(pctProc/META_PROC*100,150)}%"></div></div>
+      <div class="kpi-meta ${diffP>0?'down':'up'}">${diffP>0?'▲':'▼'} ${fmt(Math.abs(diffP),2)}% vs meta ${META_PROC}%</div>
     </div>
     <div class="kpi-card orange">
-      <div class="kpi-label">Merma Trim</div>
+      <div class="kpi-label">Trim (kg)</div>
       <div class="kpi-value">${fmt(trim/1000,1)}</div>
-      <div class="kpi-unit">toneladas</div>
+      <div class="kpi-unit">toneladas acumuladas</div>
       <div class="kpi-meta neutral">${fmt(trim)} kg</div>
     </div>
     <div class="kpi-card warn">
-      <div class="kpi-label">Merma Proceso</div>
+      <div class="kpi-label">Proceso (kg)</div>
       <div class="kpi-value">${fmt(proc/1000,1)}</div>
-      <div class="kpi-unit">toneladas</div>
+      <div class="kpi-unit">toneladas acumuladas</div>
       <div class="kpi-meta neutral">${fmt(proc)} kg</div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Merma Total</div>
-      <div class="kpi-value">${fmt(total/1000,1)}</div>
-      <div class="kpi-unit">toneladas perdidas</div>
-      <div class="kpi-meta neutral">${fmt(total)} kg</div>
     </div>`;
 }
 
 // ── COMP MERMA ────────────────────────────────────────────────────────────────
 function renderCompMerma({ dActual, dMesPrev, dAnioPrev, meta, mes, anio, mesPrevNum, anioPrev, anioAntNum }) {
-  const mermaKg = arr => sum(arr,'mermaTrim')+sum(arr,'mermaProc');
-  const mermaPct= arr => { const p=sum(arr,'tonProd'); return p>0 ? (mermaKg(arr)/p*100) : 0; };
+  const mermaTrimKg = arr => sum(arr,'mermaTrim');
+  const mermaProc_Kg = arr => sum(arr,'mermaProc');
+  const mermaTrimPct = arr => { const p=sum(arr,'tonProd'); return p>0 ? (mermaTrimKg(arr)/p*100) : 0; };
+  const mermaProcPct = arr => { const p=sum(arr,'tonProd'); return p>0 ? (mermaProc_Kg(arr)/p*100) : 0; };
 
-  const now = mermaPct(dActual);
-  const prev= mermaPct(dMesPrev);
-  const yr  = mermaPct(dAnioPrev);
-  const metaM=(meta.metaMerma||META_MERMA)*100;
+  const tNow = mermaTrimPct(dActual),  tPrev = mermaTrimPct(dMesPrev),  tYr = mermaTrimPct(dAnioPrev);
+  const pNow = mermaProcPct(dActual),  pPrev = mermaProcPct(dMesPrev),  pYr = mermaProcPct(dAnioPrev);
 
-  const dMeta = delta(now*-1, metaM*-1); // invertido: menor merma = positivo
-  const dPrev = delta(now*-1, prev*-1);
-  const dYr   = delta(now*-1, yr*-1);
-
-  const row = (label, val, comp, d, compLabel) => `
-    <div class="comp-row">
+  const row = (label, val, comp, compLabel, invert=true) => {
+    const d = comp===0 ? {txt:'—',cls:'neu'} : (()=>{
+      const pct = ((val-comp)/Math.abs(comp)*100);
+      const good = invert ? pct<=0 : pct>=0;
+      return { txt:(pct>=0?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%', cls:good?'pos':'neg' };
+    })();
+    return `<div class="comp-row">
       <span class="comp-metric">${label}</span>
       <div class="comp-vals">
         <span class="comp-now">${fmt(val,2)}%</span>
@@ -806,25 +812,23 @@ function renderCompMerma({ dActual, dMesPrev, dAnioPrev, meta, mes, anio, mesPre
         <span class="delta ${d.cls}">${d.txt}</span>
       </div>
     </div>`;
+  };
 
   document.getElementById('compMerma').innerHTML = `
-    <div class="comp-card" style="border-color:rgba(0,229,160,0.25);">
-      <div class="comp-title">📌 vs Meta ${MESES[mes]} ${anio}</div>
-      ${row('% Merma', now, metaM, dMeta, 'meta')}
-      ${row('Trim kg', sum(dActual,'mermaTrim'), 0, {txt:'—',cls:'neu'}, '—')}
-      ${row('Proc kg', sum(dActual,'mermaProc'), 0, {txt:'—',cls:'neu'}, '—')}
+    <div class="comp-card" style="border-color:rgba(0,102,204,0.25);">
+      <div class="comp-title">📌 vs Metas Fijas</div>
+      ${row('% Trim (pagada)',    tNow, META_TRIM,  'meta 3.5%')}
+      ${row('% Proceso (no pag)',pNow, META_PROC,  'meta 10.5%')}
     </div>
-    <div class="comp-card" style="border-color:rgba(255,209,102,0.2);">
+    <div class="comp-card" style="border-color:rgba(230,168,23,0.2);">
       <div class="comp-title">📅 vs ${MESES[mesPrevNum]} ${anioPrev} (mismo corte)</div>
-      ${row('% Merma',  now,  prev, dPrev, 'ant')}
-      ${row('Trim kg',  sum(dActual,'mermaTrim'), sum(dMesPrev,'mermaTrim'), delta(sum(dActual,'mermaTrim')*-1, sum(dMesPrev,'mermaTrim')*-1), 'ant')}
-      ${row('Proc kg',  sum(dActual,'mermaProc'), sum(dMesPrev,'mermaProc'), delta(sum(dActual,'mermaProc')*-1, sum(dMesPrev,'mermaProc')*-1), 'ant')}
+      ${row('% Trim',    tNow, tPrev, `${MESES[mesPrevNum].substring(0,3)} ${fmt(tPrev,2)}%`)}
+      ${row('% Proceso', pNow, pPrev, `${MESES[mesPrevNum].substring(0,3)} ${fmt(pPrev,2)}%`)}
     </div>
-    <div class="comp-card" style="border-color:rgba(77,159,255,0.2);">
+    <div class="comp-card" style="border-color:rgba(0,153,204,0.2);">
       <div class="comp-title">📆 vs ${MESES[mes]} ${anioAntNum} (mismo corte)</div>
-      ${row('% Merma',  now,  yr, dYr, 'ant')}
-      ${row('Trim kg',  sum(dActual,'mermaTrim'), sum(dAnioPrev,'mermaTrim'), delta(sum(dActual,'mermaTrim')*-1, sum(dAnioPrev,'mermaTrim')*-1), 'ant')}
-      ${row('Proc kg',  sum(dActual,'mermaProc'), sum(dAnioPrev,'mermaProc'), delta(sum(dActual,'mermaProc')*-1, sum(dAnioPrev,'mermaProc')*-1), 'ant')}
+      ${row('% Trim',    tNow, tYr, `${anioAntNum} ${fmt(tYr,2)}%`)}
+      ${row('% Proceso', pNow, pYr, `${anioAntNum} ${fmt(pYr,2)}%`)}
     </div>`;
 }
 
@@ -844,23 +848,28 @@ function renderChartMermaLinea({ dActual, dMesPrev }) {
 }
 
 // ── CHART MERMA PCT ───────────────────────────────────────────────────────────
-function renderChartMermaPct({ dActual, meta }) {
+function renderChartMermaPct({ dActual }) {
   destroyChart('chartMermaPct');
   const sorted = [...dActual].sort((a,b)=>a.dia-b.dia).filter(r=>r.tonProd>0);
-  let acumMerma=0, acumProd=0;
-  const labels=[], vals=[], metas=[];
+  let acumTrim=0, acumProc=0, acumProd=0;
+  const labels=[], valsTrim=[], valsProc=[], metasTrim=[], metasProc=[];
   sorted.forEach(r => {
-    acumMerma += (r.mermaTrim||0)+(r.mermaProc||0);
-    acumProd  += (r.tonProd||0);
+    acumTrim += (r.mermaTrim||0);
+    acumProc += (r.mermaProc||0);
+    acumProd += (r.tonProd||0);
     labels.push(`D${r.dia}`);
-    vals.push(acumProd>0 ? acumMerma/acumProd*100 : 0);
-    metas.push((meta.metaMerma||META_MERMA)*100);
+    valsTrim.push(acumProd>0 ? acumTrim/acumProd*100 : 0);
+    valsProc.push(acumProd>0 ? acumProc/acumProd*100 : 0);
+    metasTrim.push(META_TRIM);
+    metasProc.push(META_PROC);
   });
   CHARTS.chartMermaPct = new Chart(document.getElementById('chartMermaPct'), {
     type:'line',
     data:{ labels, datasets:[
-      { label:'% Merma acum.', data:vals,  borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.1)', borderWidth:2, fill:true, tension:0.3, pointRadius:3 },
-      { label:'Meta',          data:metas, borderColor:'#ff4757', borderWidth:1.5, borderDash:[6,4], pointRadius:0 }
+      { label:'% Trim acum.',   data:valsTrim, borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.08)', borderWidth:2, fill:true, tension:0.3, pointRadius:3 },
+      { label:'Meta Trim 3.5%', data:metasTrim, borderColor:'#ff6b35', borderWidth:1.5, borderDash:[6,4], pointRadius:0 },
+      { label:'% Proc acum.',   data:valsProc, borderColor:'#d63031', backgroundColor:'rgba(214,48,49,0.08)', borderWidth:2, fill:true, tension:0.3, pointRadius:3 },
+      { label:'Meta Proc 10.5%',data:metasProc, borderColor:'#d63031', borderWidth:1.5, borderDash:[6,4], pointRadius:0 }
     ]},
     options: chartBase('%')
   });
