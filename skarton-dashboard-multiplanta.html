@@ -776,15 +776,15 @@ function renderKPIMerma({ dActual }) {
     </div>
     <div class="kpi-card orange">
       <div class="kpi-label">Trim (kg)</div>
-      <div class="kpi-value">${fmt(trim/1000,1)}</div>
-      <div class="kpi-unit">toneladas acumuladas</div>
-      <div class="kpi-meta neutral">${fmt(trim)} kg</div>
+      <div class="kpi-value">${fmt(trim,0)}</div>
+      <div class="kpi-unit">kg acumulados</div>
+      <div class="kpi-meta neutral">${fmt(trim/1000,2)} toneladas</div>
     </div>
     <div class="kpi-card warn">
       <div class="kpi-label">Proceso (kg)</div>
-      <div class="kpi-value">${fmt(proc/1000,1)}</div>
-      <div class="kpi-unit">toneladas acumuladas</div>
-      <div class="kpi-meta neutral">${fmt(proc)} kg</div>
+      <div class="kpi-value">${fmt(proc,0)}</div>
+      <div class="kpi-unit">kg acumulados</div>
+      <div class="kpi-meta neutral">${fmt(proc/1000,2)} toneladas</div>
     </div>`;
 }
 
@@ -884,7 +884,7 @@ function renderKPIDevol({ devActual }) {
   document.getElementById('kpiDevol').innerHTML = `
     <div class="kpi-card danger"><div class="kpi-label">Total Devoluciones</div><div class="kpi-value">${total}</div><div class="kpi-unit">registros del período</div></div>
     <div class="kpi-card warn"><div class="kpi-label">Piezas Devueltas</div><div class="kpi-value">${fmt(piezas)}</div><div class="kpi-unit">piezas</div></div>
-    <div class="kpi-card orange"><div class="kpi-label">Kilos Involucrados</div><div class="kpi-value">${fmt(kilos/1000,1)}</div><div class="kpi-unit">toneladas</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Kilos Involucrados</div><div class="kpi-value">${fmt(kilos,0)}</div><div class="kpi-unit">kg</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Clientes Afectados</div><div class="kpi-value">${clientes}</div><div class="kpi-unit">clientes únicos</div></div>`;
   document.getElementById('totalDevol').textContent = `${total} registros`;
 }
