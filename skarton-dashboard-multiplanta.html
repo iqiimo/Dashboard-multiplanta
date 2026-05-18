@@ -20,12 +20,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .app{position:relative;z-index:1;}
 
 /* LOADING */
-#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px;}
+#loading{position:fixed;inset:0;background:#111318;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px;}
 .loading-logo{font-family:var(--font-display);font-size:64px;letter-spacing:8px;color:var(--accent);}
-.loading-bar-track{width:320px;height:2px;background:var(--border);overflow:hidden;}
-.loading-bar{height:100%;background:var(--accent);animation:loadbar 2s ease-in-out forwards;}
+.loading-bar-track{width:320px;height:2px;background:#1e2330;overflow:hidden;}
+.loading-bar{height:100%;background:#0066cc;animation:loadbar 6s ease-in-out forwards;}
 @keyframes loadbar{from{width:0}to{width:100%}}
-.loading-text{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:2px;animation:blink 1s infinite;}
+.loading-text{font-family:var(--font-mono);font-size:11px;color:#8892a4;letter-spacing:2px;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* ERROR */
@@ -442,11 +442,6 @@ async function loadData() {
   // Set loading logo
   const loadingLogoEl = document.getElementById('loadingLogo');
   if (loadingLogoEl) loadingLogoEl.src = LOGO_GLOBALTY;
-  // Intentional 5s loading for first load only
-  if (!window._loaded) {
-    await new Promise(r => setTimeout(r, 5000));
-    window._loaded = true;
-  }
   try {
     const planta = document.getElementById('filterPlanta').value;
     const metaSheet = `METAS_${planta.toUpperCase()}`;
@@ -463,6 +458,10 @@ async function loadData() {
     document.getElementById('filterAnio').value = anioActual;
     document.getElementById('filterMes').value  = mesActual;
 
+    if (!window._loaded) {
+      window._loaded = true;
+      await new Promise(r => setTimeout(r, 5000));
+    }
     document.getElementById('loading').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('periodoBanner').style.display = 'flex';
