@@ -7,425 +7,136 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0c0f;
-    --surface: #111318;
-    --surface2: #181c23;
-    --border: #1e2330;
-    --accent: #00e5a0;
-    --accent2: #ff6b35;
-    --accent3: #4d9fff;
-    --warn: #ffd166;
-    --danger: #ff4757;
-    --text: #e8eaf0;
-    --text-muted: #5a6070;
-    --text-dim: #8892a4;
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-mono: 'IBM Plex Mono', monospace;
-    --font-body: 'IBM Plex Sans', sans-serif;
-  }
+:root {
+  --bg:#0a0c0f; --surface:#111318; --surface2:#181c23; --border:#1e2330;
+  --accent:#00e5a0; --accent2:#ff6b35; --accent3:#4d9fff; --warn:#ffd166;
+  --danger:#ff4757; --text:#e8eaf0; --text-muted:#5a6070; --text-dim:#8892a4;
+  --font-display:'Bebas Neue',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  --font-body:'IBM Plex Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px;}
+.loading-logo{font-family:var(--font-display);font-size:64px;letter-spacing:8px;color:var(--accent);}
+.loading-bar-track{width:320px;height:2px;background:var(--border);overflow:hidden;}
+.loading-bar{height:100%;background:var(--accent);animation:loadbar 2s ease-in-out forwards;}
+@keyframes loadbar{from{width:0}to{width:100%}}
+.loading-text{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:2px;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* ERROR */
+#error-banner{display:none;background:rgba(255,71,87,0.1);border:1px solid var(--danger);color:var(--danger);font-family:var(--font-mono);font-size:12px;padding:12px 32px;text-align:center;}
 
-  /* GRID BACKGROUND */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(10,12,15,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:12px;}
+.logo-block{display:flex;align-items:center;gap:14px;}
+.logo-box{width:40px;height:40px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:20px;color:#000;}
+.logo-text{font-family:var(--font-display);font-size:24px;letter-spacing:3px;}
+.logo-sub{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;margin-top:2px;}
+.header-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.filter-group{display:flex;align-items:center;gap:8px;}
+.filter-label{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;}
+select{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:6px 10px;cursor:pointer;outline:none;transition:border-color .2s;}
+select:hover{border-color:var(--accent);}
+.status-pill{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);padding:5px 10px;border:1px solid var(--border);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-  .app { position: relative; z-index: 1; }
+/* PERIODO BANNER */
+.periodo-banner{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+.periodo-item{display:flex;flex-direction:column;gap:2px;}
+.periodo-label{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;}
+.periodo-val{font-family:var(--font-mono);font-size:12px;color:var(--accent);}
+.periodo-sep{width:1px;height:28px;background:var(--border);}
 
-  /* HEADER */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(10,12,15,0.95);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+/* MAIN */
+main{padding:24px 28px;display:none;}
 
-  .logo-block { display: flex; align-items: center; gap: 16px; }
-  .logo-box {
-    width: 44px; height: 44px;
-    background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display);
-    font-size: 22px;
-    color: #000;
-    letter-spacing: 1px;
-  }
-  .logo-text { 
-    font-family: var(--font-display);
-    font-size: 26px;
-    letter-spacing: 3px;
-    color: var(--text);
-  }
-  .logo-sub {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
+/* TABS */
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:22px;}
+.tab-btn{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;padding:10px 20px;cursor:pointer;border:none;background:transparent;color:var(--text-muted);border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn:hover{color:var(--text);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
 
-  .header-right { display: flex; align-items: center; gap: 20px; }
+/* SECTION TITLE */
+.section-title{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-muted);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  .filter-group { display: flex; align-items: center; gap: 10px; }
-  .filter-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
-  
-  select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    padding: 6px 12px;
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  select:hover { border-color: var(--accent); }
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:22px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
+.kpi-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent);}
+.kpi-card.warn::before{background:var(--warn);}
+.kpi-card.danger::before{background:var(--danger);}
+.kpi-card.blue::before{background:var(--accent3);}
+.kpi-card.orange::before{background:var(--accent2);}
+.kpi-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;}
+.kpi-value{font-family:var(--font-display);font-size:38px;line-height:1;color:var(--text);}
+.kpi-unit{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:3px;}
+.kpi-meta{font-family:var(--font-mono);font-size:9px;margin-top:6px;}
+.up{color:var(--accent);} .down{color:var(--danger);} .neutral{color:var(--text-muted);}
+.progress-track{margin-top:8px;height:2px;background:var(--border);}
+.progress-fill{height:100%;background:var(--accent);transition:width 1s ease;}
+.progress-fill.warn{background:var(--warn);} .progress-fill.danger{background:var(--danger);}
 
-  .status-pill {
-    display: flex; align-items: center; gap: 6px;
-    font-family: var(--font-mono); font-size: 11px;
-    color: var(--text-dim);
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-  }
-  .status-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+/* COMPARATIVO ROW */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+.comp-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
+.comp-title{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px;}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(30,35,48,0.5);}
+.comp-row:last-child{border-bottom:none;}
+.comp-metric{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);}
+.comp-vals{display:flex;gap:12px;align-items:center;}
+.comp-now{font-family:var(--font-mono);font-size:11px;color:var(--text);}
+.comp-prev{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
+.delta{font-family:var(--font-mono);font-size:9px;padding:1px 5px;}
+.delta.pos{color:var(--accent);} .delta.neg{color:var(--danger);} .delta.neu{color:var(--text-muted);}
 
-  /* LOADING */
-  #loading {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 999;
-    gap: 20px;
-  }
-  .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); }
-  .loading-bar-track {
-    width: 320px; height: 2px;
-    background: var(--border);
-    position: relative; overflow: hidden;
-  }
-  .loading-bar {
-    height: 100%;
-    background: var(--accent);
-    animation: loadbar 1.8s ease-in-out forwards;
-  }
-  @keyframes loadbar { from { width: 0; } to { width: 100%; } }
-  .loading-text {
-    font-family: var(--font-mono); font-size: 11px;
-    color: var(--text-muted); letter-spacing: 2px;
-    animation: blink 1s infinite;
-  }
-  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:22px;}
+.charts-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);padding:18px;}
+.chart-title{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.chart-tag{font-size:8px;padding:2px 6px;border:1px solid var(--border);color:var(--text-muted);}
+canvas{max-height:220px;}
 
-  /* ERROR */
-  #error-banner {
-    display: none;
-    background: rgba(255,71,87,0.1);
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    padding: 12px 32px;
-    text-align: center;
-  }
+/* TABLE */
+.table-card{background:var(--surface);border:1px solid var(--border);margin-bottom:22px;overflow:hidden;}
+.table-header{padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--surface2);font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{font-family:var(--font-mono);font-size:11px;padding:9px 14px;border-bottom:1px solid rgba(30,35,48,0.5);color:var(--text-dim);white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(0,229,160,0.03);color:var(--text);}
+td.hl{color:var(--text);} td.acc{color:var(--accent);} td.dng{color:var(--danger);} td.wrn{color:var(--warn);}
+.chip{display:inline-block;padding:2px 7px;font-size:9px;font-family:var(--font-mono);}
+.chip-ok{background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.3);}
+.chip-warn{background:rgba(255,209,102,0.1);color:var(--warn);border:1px solid rgba(255,209,102,0.3);}
+.chip-bad{background:rgba(255,71,87,0.1);color:var(--danger);border:1px solid rgba(255,71,87,0.3);}
 
-  /* MAIN */
-  main { padding: 28px 32px; display: none; }
+footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;}
 
-  /* SECTION TITLE */
-  .section-title {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .section-title::after {
-    content: '';
-    flex: 1; height: 1px;
-    background: var(--border);
-  }
-
-  /* KPI CARDS */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s, transform 0.2s;
-    cursor: default;
-  }
-  .kpi-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px; height: 100%;
-    background: var(--accent);
-  }
-  .kpi-card.warn::before { background: var(--warn); }
-  .kpi-card.danger::before { background: var(--danger); }
-  .kpi-card.blue::before { background: var(--accent3); }
-  .kpi-card.orange::before { background: var(--accent2); }
-
-  .kpi-label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .kpi-value {
-    font-family: var(--font-display);
-    font-size: 42px;
-    line-height: 1;
-    color: var(--text);
-    letter-spacing: 1px;
-  }
-  .kpi-unit {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
-  .kpi-meta {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    margin-top: 8px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .badge-up { color: var(--accent); }
-  .badge-down { color: var(--danger); }
-  .badge-warn { color: var(--warn); }
-
-  /* PROGRESS BAR */
-  .progress-track {
-    margin-top: 10px;
-    height: 3px;
-    background: var(--border);
-    position: relative;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    transition: width 1s ease;
-  }
-  .progress-fill.warn { background: var(--warn); }
-  .progress-fill.danger { background: var(--danger); }
-
-  /* CHARTS GRID */
-  .charts-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .charts-grid-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 20px;
-  }
-  .chart-title {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .chart-tag {
-    font-size: 9px;
-    padding: 2px 8px;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-  }
-
-  /* TABLE */
-  .table-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    margin-bottom: 28px;
-    overflow: hidden;
-  }
-  .table-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    background: var(--surface2);
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    padding: 10px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  td {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    padding: 10px 16px;
-    border-bottom: 1px solid rgba(30,35,48,0.6);
-    color: var(--text-dim);
-    white-space: nowrap;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(0,229,160,0.03); color: var(--text); }
-  td.highlight { color: var(--text); font-weight: 600; }
-  td.accent { color: var(--accent); }
-  td.danger { color: var(--danger); }
-  td.warn { color: var(--warn); }
-
-  .merma-chip {
-    display: inline-block;
-    padding: 2px 8px;
-    font-size: 10px;
-    font-family: var(--font-mono);
-  }
-  .chip-ok { background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.3); }
-  .chip-warn { background: rgba(255,209,102,0.1); color: var(--warn); border: 1px solid rgba(255,209,102,0.3); }
-  .chip-bad { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.3); }
-
-  /* DEVOLUCIONES */
-  .devol-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  /* FOOTER */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-  }
-
-  /* CANVAS sizing */
-  canvas { max-height: 240px; }
-
-  /* TABS */
-  .tab-bar {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 24px;
-  }
-  .tab-btn {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    padding: 12px 24px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab-btn:hover { color: var(--text); }
-
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    .charts-grid, .charts-grid-3, .devol-grid { grid-template-columns: 1fr; }
-    header { flex-direction: column; gap: 12px; align-items: flex-start; }
-    main { padding: 16px; }
-  }
+@media(max-width:900px){.charts-grid,.charts-grid-2,.comp-grid{grid-template-columns:1fr;}header{flex-direction:column;align-items:flex-start;}main{padding:14px;}}
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- LOADING -->
 <div id="loading">
   <div class="loading-logo">SKARTON</div>
   <div class="loading-bar-track"><div class="loading-bar"></div></div>
-  <div class="loading-text">CARGANDO DATOS DESDE GOOGLE SHEETS...</div>
+  <div class="loading-text">CARGANDO DATOS...</div>
 </div>
 
-<!-- ERROR -->
-<div id="error-banner">
-  ⚠ ERROR AL CARGAR DATOS — Verifica que el Sheet sea público y que el ID sea correcto.
-  <span id="error-detail"></span>
-</div>
+<div id="error-banner">⚠ ERROR AL CARGAR — <span id="error-detail"></span></div>
 
-<!-- HEADER -->
 <header>
   <div class="logo-block">
     <div class="logo-box">SK</div>
@@ -444,34 +155,51 @@
       </select>
     </div>
     <div class="filter-group">
-      <span class="filter-label">MES</span>
-      <select id="filterMes" onchange="applyFilters()">
-        <option value="all">Todos</option>
-        <option value="1">Enero</option>
-        <option value="2">Febrero</option>
-        <option value="3">Marzo</option>
-        <option value="4">Abril</option>
-        <option value="5">Mayo</option>
-        <option value="6">Junio</option>
-        <option value="7">Julio</option>
-        <option value="8">Agosto</option>
-        <option value="9">Septiembre</option>
-        <option value="10">Octubre</option>
-        <option value="11">Noviembre</option>
-        <option value="12">Diciembre</option>
+      <span class="filter-label">AÑO</span>
+      <select id="filterAnio" onchange="applyFilters()">
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
       </select>
     </div>
-    <div class="status-pill">
-      <div class="status-dot"></div>
-      <span id="lastUpdate">CONECTADO</span>
+    <div class="filter-group">
+      <span class="filter-label">MES</span>
+      <select id="filterMes" onchange="applyFilters()">
+        <option value="1">Enero</option><option value="2">Febrero</option>
+        <option value="3">Marzo</option><option value="4">Abril</option>
+        <option value="5">Mayo</option><option value="6">Junio</option>
+        <option value="7">Julio</option><option value="8">Agosto</option>
+        <option value="9">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
     </div>
+    <div class="status-pill"><div class="status-dot"></div><span id="lastUpdate">CONECTANDO...</span></div>
   </div>
 </header>
 
-<!-- MAIN -->
-<main id="mainContent">
+<!-- PERIODO BANNER -->
+<div class="periodo-banner" id="periodoBanner" style="display:none;">
+  <div class="periodo-item">
+    <div class="periodo-label">PERÍODO ANALIZADO</div>
+    <div class="periodo-val" id="pBanner">—</div>
+  </div>
+  <div class="periodo-sep"></div>
+  <div class="periodo-item">
+    <div class="periodo-label">CORTE AL DÍA</div>
+    <div class="periodo-val" id="pCorte">—</div>
+  </div>
+  <div class="periodo-sep"></div>
+  <div class="periodo-item">
+    <div class="periodo-label">COMPARATIVO A</div>
+    <div class="periodo-val" id="pCompMes">—</div>
+  </div>
+  <div class="periodo-sep"></div>
+  <div class="periodo-item">
+    <div class="periodo-label">Y A</div>
+    <div class="periodo-val" id="pCompAnio">—</div>
+  </div>
+</div>
 
-  <!-- TABS -->
+<main id="mainContent">
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('produccion')">📦 Producción</button>
     <button class="tab-btn" onclick="switchTab('merma')">♻️ Merma</button>
@@ -479,261 +207,181 @@
     <button class="tab-btn" onclick="switchTab('diario')">📅 Detalle Diario</button>
   </div>
 
-  <!-- TAB: PRODUCCIÓN -->
+  <!-- TAB PRODUCCIÓN -->
   <div id="tab-produccion" class="tab-panel active">
-    <div class="section-title">KPIs Principales</div>
+    <div class="section-title">KPIs del Período</div>
     <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="section-title">Comparativo</div>
+    <div class="comp-grid" id="compGrid"></div>
 
     <div class="charts-grid">
       <div class="chart-card">
-        <div class="chart-title">
-          Toneladas Embarcadas vs Producidas — Diario
-          <span class="chart-tag">LÍNEA</span>
-        </div>
-        <canvas id="chartTons"></canvas>
+        <div class="chart-title">Tons Embarcadas — Acumulado diario del mes <span class="chart-tag">LÍNEA</span></div>
+        <canvas id="chartAcum"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title">
-          m² Producidos — por Mes
-          <span class="chart-tag">BARRAS</span>
-        </div>
-        <canvas id="chartM2"></canvas>
+        <div class="chart-title">Avance vs Meta <span class="chart-tag">DONA</span></div>
+        <canvas id="chartMeta"></canvas>
       </div>
     </div>
 
-    <div class="charts-grid">
+    <div class="charts-grid-2">
       <div class="chart-card">
-        <div class="chart-title">
-          Tons Embarcadas vs Meta Mensual
-          <span class="chart-tag">CUMPLIMIENTO</span>
-        </div>
-        <canvas id="chartMeta"></canvas>
+        <div class="chart-title">Tons Diarias — Mes actual vs Mes anterior <span class="chart-tag">BARRAS</span></div>
+        <canvas id="chartComparoDia"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title">
-          Días productivos vs paros
-          <span class="chart-tag">DONA</span>
-        </div>
+        <div class="chart-title">Días productivos vs paros <span class="chart-tag">DONA</span></div>
         <canvas id="chartDias"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- TAB: MERMA -->
+  <!-- TAB MERMA -->
   <div id="tab-merma" class="tab-panel">
     <div class="section-title">Análisis de Merma</div>
     <div class="kpi-grid" id="kpiMerma"></div>
-
-    <div class="charts-grid">
+    <div class="comp-grid" id="compMerma"></div>
+    <div class="charts-grid-2">
       <div class="chart-card">
-        <div class="chart-title">
-          Merma Diaria (Trim + Proceso) kg
-          <span class="chart-tag">ÁREA</span>
-        </div>
+        <div class="chart-title">Merma Diaria kg — Mes actual <span class="chart-tag">ÁREA</span></div>
         <canvas id="chartMermaLinea"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title">
-          Merma por Mes — Composición
-          <span class="chart-tag">BARRAS</span>
-        </div>
-        <canvas id="chartMermaMes"></canvas>
+        <div class="chart-title">% Merma acumulado vs Meta (10.5%) <span class="chart-tag">LÍNEA</span></div>
+        <canvas id="chartMermaPct"></canvas>
       </div>
-    </div>
-
-    <div class="chart-card" style="margin-bottom:28px;">
-      <div class="chart-title">
-        % Merma Total vs Meta (10.5%)
-        <span class="chart-tag">TENDENCIA</span>
-      </div>
-      <canvas id="chartMermaPct" style="max-height:160px;"></canvas>
     </div>
   </div>
 
-  <!-- TAB: DEVOLUCIONES -->
+  <!-- TAB DEVOLUCIONES -->
   <div id="tab-devoluciones" class="tab-panel">
-    <div class="section-title">Análisis de Devoluciones</div>
+    <div class="section-title">Devoluciones del Período</div>
     <div class="kpi-grid" id="kpiDevol"></div>
-
-    <div class="devol-grid">
+    <div class="charts-grid-2">
       <div class="chart-card">
-        <div class="chart-title">Por Departamento Responsable <span class="chart-tag">DONA</span></div>
+        <div class="chart-title">Por Responsable <span class="chart-tag">DONA</span></div>
         <canvas id="chartDevolDepto"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Top 10 Clientes con más Devoluciones <span class="chart-tag">HORIZONTAL</span></div>
+        <div class="chart-title">Top 10 Clientes — Piezas devueltas <span class="chart-tag">HORIZONTAL</span></div>
         <canvas id="chartDevolCliente"></canvas>
       </div>
     </div>
-
     <div class="table-card">
-      <div class="table-header">
-        Últimas 30 devoluciones
-        <span id="totalDevol" style="color:var(--accent);">— registros</span>
-      </div>
+      <div class="table-header">Registros del período <span id="totalDevol" style="color:var(--accent);">—</span></div>
       <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Cliente</th>
-              <th>Pedido</th>
-              <th>Responsable</th>
-              <th>Motivo</th>
-              <th>Piezas</th>
-            </tr>
-          </thead>
-          <tbody id="tablaDevoluciones"></tbody>
-        </table>
+        <table><thead><tr><th>Fecha</th><th>Cliente</th><th>Pedido</th><th>Responsable</th><th>Motivo</th><th>Piezas</th><th>Kilos</th></tr></thead>
+        <tbody id="tablaDevoluciones"></tbody></table>
       </div>
     </div>
   </div>
 
-  <!-- TAB: DIARIO -->
+  <!-- TAB DIARIO -->
   <div id="tab-diario" class="tab-panel">
-    <div class="section-title">Detalle Diario de Producción</div>
+    <div class="section-title">Detalle Diario</div>
     <div class="table-card">
-      <div class="table-header">
-        Registros de Producción
-        <select id="mesTabla" onchange="renderTabla()" style="font-size:11px; padding:4px 10px;">
-          <option value="all">Todos los meses</option>
-          <option value="1">Enero</option>
-          <option value="2">Febrero</option>
-          <option value="3">Marzo</option>
-          <option value="4">Abril</option>
-          <option value="5">Mayo</option>
-        </select>
-      </div>
+      <div class="table-header">Producción día a día — período seleccionado</div>
       <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tons Embarcadas</th>
-              <th>Tons Producidas</th>
-              <th>m² Producidos</th>
-              <th>Merma Trim (kg)</th>
-              <th>Merma Proc (kg)</th>
-              <th>Merma Total (kg)</th>
-              <th>% Merma</th>
-              <th>Obs</th>
-            </tr>
-          </thead>
-          <tbody id="tablaProduccion"></tbody>
-        </table>
+        <table><thead><tr><th>Fecha</th><th>Tons Emb.</th><th>Tons Prod.</th><th>m²</th><th>Merma Trim</th><th>Merma Proc</th><th>Merma Total</th><th>% Merma</th><th>Acum. Emb.</th><th>Obs</th></tr></thead>
+        <tbody id="tablaProduccion"></tbody></table>
       </div>
     </div>
   </div>
-
 </main>
 
 <footer>
-  <span>SKARTON PLANTA TOLCAYUCA — DASHBOARD OPERATIVO v2.0</span>
+  <span>SKARTON — DASHBOARD OPERATIVO v3.0</span>
   <span id="footerTs">—</span>
 </footer>
 
 </div>
-
 <script>
 const SHEET_ID = '1l2bhTXyX4_fXa_SNd3rmwPNmI3KsBcg7ZavDs86kDzU';
+const SHEET_GIDS = {
+  DATOS_DIARIOS:   '2007353738',
+  DEVOLUCIONES:    '2860544',
+  METAS_TOLCAYUCA: '665457450',
+  METAS_GLAMA:     '961587863',
+  METAS_DESA:      '1747428787'
+};
 const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const MESES_SHORT = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const META_MERMA = 0.105;
+const CHARTS = {};
 
 let rawDiarios = [], rawDevoluciones = [], rawMetas = [];
-let filtDiarios = [], filtDevoluciones = [];
-let charts = {};
+let hoy = new Date();
+let mesActual = hoy.getMonth() + 1;
+let anioActual = hoy.getFullYear();
+let diaCorte = hoy.getDate();
 
-// ─── FETCH SHEETS via CSV export (sin CORS issues) ───────────────────────────
-// GID de cada hoja — se obtiene de la URL al hacer click en cada pestaña
-const SHEET_GIDS = {
-  'DATOS_DIARIOS':    '2007353738',
-  'DEVOLUCIONES':     '2860544',
-  'METAS_TOLCAYUCA':  '665457450',
-  'METAS_GLAMA':      '961587863',
-  'METAS_DESA':       '1747428787'
-};
-
-function csvUrl(sheetName) {
-  const gid = SHEET_GIDS[sheetName];
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+// ── CSV FETCH ──────────────────────────────────────────────────────────────────
+function csvUrl(sheet) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GIDS[sheet]}`;
 }
-
-async function fetchSheet(sheetName) {
-  const url = csvUrl(sheetName);
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`HTTP ${r.status} en ${sheetName}`);
+async function fetchCSV(sheet) {
+  const r = await fetch(csvUrl(sheet));
+  if (!r.ok) throw new Error(`HTTP ${r.status} — ${sheet}`);
   const txt = await r.text();
   return parseCSV(txt);
 }
-
 function parseCSV(txt) {
   const lines = txt.trim().split('\n');
-  if (lines.length < 2) return { rows: [] };
-  // Skip header row, build fake "table" compatible with parsers
   const rows = [];
   for (let i = 1; i < lines.length; i++) {
-    const cols = splitCSVLine(lines[i]);
-    rows.push({ c: cols.map(v => ({ v: v.trim() })) });
+    const cols = splitLine(lines[i]);
+    rows.push({ c: cols.map(v => ({ v: v.replace(/^"|"$/g,'').trim() })) });
   }
   return { rows };
 }
-
-function splitCSVLine(line) {
-  const result = [];
-  let cur = '', inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') { inQ = !inQ; }
-    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
-    else { cur += ch; }
+function splitLine(line) {
+  const res = []; let cur = '', inQ = false;
+  for (const ch of line) {
+    if (ch === '"') inQ = !inQ;
+    else if (ch === ',' && !inQ) { res.push(cur); cur = ''; }
+    else cur += ch;
   }
-  result.push(cur);
-  return result;
+  res.push(cur);
+  return res;
 }
 
-function excelSerial(v) {
-  if (!v && v !== 0) return null;
-  const n = parseFloat(v);
-  if (isNaN(n)) return null;
-  // Excel serial: days since 1900-01-01 (with Lotus bug offset)
-  const d = new Date((n - 25569) * 86400 * 1000);
-  if (isNaN(d.getTime())) return null;
-  return d;
+// ── DATE PARSE ────────────────────────────────────────────────────────────────
+function parseDate(v) {
+  if (!v) return null;
+  // Google Sheets CSV: M/D/YYYY
+  const s = String(v).trim();
+  const p = s.split('/');
+  if (p.length === 3) {
+    let [a, b, c] = p.map(Number);
+    // M/D/YYYY
+    let d = new Date(c, a-1, b);
+    if (!isNaN(d.getTime()) && a <= 12) return d;
+    // D/M/YYYY fallback
+    d = new Date(c, b-1, a);
+    if (!isNaN(d.getTime())) return d;
+  }
+  return null;
 }
 
+// ── PARSERS ───────────────────────────────────────────────────────────────────
 function parseDiarios(table) {
   const rows = [];
-  if (!table || !table.rows) return rows;
   for (const row of table.rows) {
     const c = row.c;
-    if (!c || !c[0]) continue;
-    let fecha = null;
-    const fv = c[0]?.v;
-    if (typeof fv === 'number') fecha = excelSerial(fv);
-    else if (typeof fv === 'string') {
-      // Google Sheets CSV exports as M/D/YYYY (American format)
-      const parts = fv.split('/');
-      if (parts.length === 3) {
-        // Try M/D/YYYY first (Google Sheets default)
-        const d1 = new Date(+parts[2], +parts[0]-1, +parts[1]);
-        // Validate: month must be 1-12, day 1-31
-        if (+parts[0] <= 12 && +parts[1] <= 31) fecha = d1;
-        else fecha = new Date(+parts[2], +parts[1]-1, +parts[0]); // fallback DD/MM/YYYY
-      }
-    }
-    if (!fecha || isNaN(fecha.getTime())) continue;
+    if (!c || !c[0]?.v) continue;
+    const fecha = parseDate(c[0].v);
+    if (!fecha) continue;
     const planta = c[1]?.v || '';
-    const tonEmb = parseFloat(c[2]?.v) || 0;
-    const tonProd = parseFloat(c[3]?.v) || 0;
-    const m2 = parseFloat(c[4]?.v) || 0;
-    const mermaTrim = parseFloat(c[5]?.v) || 0;
-    const mermaProc = parseFloat(c[6]?.v) || 0;
-    const obs = c[7]?.v || '';
-    rows.push({ fecha, planta, tonEmb, tonProd, m2, mermaTrim, mermaProc, obs,
-      mermaTotal: mermaTrim + mermaProc,
-      mes: fecha.getMonth()+1,
-      dia: fecha.getDate()
+    rows.push({
+      fecha, planta,
+      tonEmb:    parseFloat(c[2]?.v) || 0,
+      tonProd:   parseFloat(c[3]?.v) || 0,
+      m2:        parseFloat(c[4]?.v) || 0,
+      mermaTrim: parseFloat(c[5]?.v) || 0,
+      mermaProc: parseFloat(c[6]?.v) || 0,
+      obs:       c[7]?.v || '',
+      anio: fecha.getFullYear(), mes: fecha.getMonth()+1, dia: fecha.getDate()
     });
   }
   return rows;
@@ -741,519 +389,587 @@ function parseDiarios(table) {
 
 function parseDevoluciones(table) {
   const rows = [];
-  if (!table || !table.rows) return rows;
   for (const row of table.rows) {
     const c = row.c;
-    if (!c || !c[0]) continue;
-    let fecha = null;
-    const fv = c[0]?.v;
-    if (typeof fv === 'number') fecha = excelSerial(fv);
-    else if (typeof fv === 'string') {
-      const p = fv.split('/');
-      if (p.length===3) {
-        fecha = new Date(+p[2],+p[0]-1,+p[1]);
-        if (isNaN(fecha.getTime()) || +p[0]>12) fecha = new Date(+p[2],+p[1]-1,+p[0]);
-      }
-    }
-    if (!fecha || isNaN(fecha.getTime())) continue;
-    const planta = c[1]?.v || "";
-    const cliente = c[2]?.v || "";
-    const pedido = c[3]?.v || "";
-    const piezas = parseFloat(c[4]?.v) || 0;
-    const kilos = parseFloat(c[5]?.v) || 0;
-    const responsable = c[6]?.v || "";
-    const motivo = c[7]?.v || "";
-    rows.push({ fecha, planta, cliente, pedido, piezas, importe: kilos, responsable, motivo,
-      mes: fecha.getMonth()+1
+    if (!c || !c[0]?.v) continue;
+    const fecha = parseDate(c[0].v);
+    if (!fecha) continue;
+    rows.push({
+      fecha, planta: c[1]?.v||'', cliente: c[2]?.v||'', pedido: c[3]?.v||'',
+      piezas: parseFloat(c[4]?.v)||0, kilos: parseFloat(c[5]?.v)||0,
+      responsable: c[6]?.v||'', motivo: c[7]?.v||'',
+      anio: fecha.getFullYear(), mes: fecha.getMonth()+1, dia: fecha.getDate()
     });
   }
   return rows;
 }
 
 function parseMetas(table) {
-  const rows = [];
-  if (!table || !table.rows) return rows;
   const mesMap = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12};
+  const rows = [];
   for (const row of table.rows) {
     const c = row.c;
-    if (!c || !c[0] || !c[0].v) continue;
-    const mesStr = (c[0].v + '').toLowerCase().trim();
+    if (!c || !c[0]?.v) continue;
+    const mesStr = String(c[0].v).toLowerCase().trim();
     const mesNum = mesMap[mesStr];
     if (!mesNum) continue;
+    const mermaRaw = c[3]?.v || '';
+    const mermaStr = String(mermaRaw).replace('%','').trim();
+    const mermaNum = parseFloat(mermaStr);
     rows.push({
       mes: mesNum,
       metaTons: parseFloat(c[1]?.v) || 0,
-      metaM2: parseFloat(c[2]?.v) || 0,
-      metaMerma: (function(v){ if(!v) return META_MERMA; const s = String(v).replace("%","").trim(); const n = parseFloat(s); return isNaN(n) ? META_MERMA : (n > 1 ? n/100 : n); })(c[3]?.v),
-      diasLab: parseFloat(c[4]?.v) || 0
+      metaM2:   parseFloat(c[2]?.v) || 0,
+      metaMerma: isNaN(mermaNum) ? META_MERMA : (mermaNum > 1 ? mermaNum/100 : mermaNum),
+      diasLab:  parseFloat(c[4]?.v) || 0
     });
   }
   return rows;
 }
 
-// ─── LOAD ─────────────────────────────────────────────────────────────────────
+// ── LOAD ──────────────────────────────────────────────────────────────────────
 async function loadData() {
   try {
-    const [tDiarios, tDevol, tMetas] = await Promise.all([
-      fetchSheet('DATOS_DIARIOS'),
-      fetchSheet('DEVOLUCIONES'),
-      fetchSheet('METAS_TOLCAYUCA')
+    const planta = document.getElementById('filterPlanta').value;
+    const metaSheet = `METAS_${planta.toUpperCase()}`;
+    const [tD, tDev, tM] = await Promise.all([
+      fetchCSV('DATOS_DIARIOS'),
+      fetchCSV('DEVOLUCIONES'),
+      fetchCSV(metaSheet in SHEET_GIDS ? metaSheet : 'METAS_TOLCAYUCA')
     ]);
-    rawDiarios = parseDiarios(tDiarios);
-    rawDevoluciones = parseDevoluciones(tDevol);
-    rawMetas = parseMetas(tMetas);
+    rawDiarios      = parseDiarios(tD);
+    rawDevoluciones = parseDevoluciones(tDev);
+    rawMetas        = parseMetas(tM);
+
+    // Set default filters to current month/year
+    document.getElementById('filterAnio').value = anioActual;
+    document.getElementById('filterMes').value  = mesActual;
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
-    document.getElementById('lastUpdate').textContent = `ACTUALIZADO ${new Date().toLocaleTimeString('es-MX')}`;
-    document.getElementById('footerTs').textContent = `ÚLTIMO FETCH: ${new Date().toLocaleString('es-MX')}`;
+    document.getElementById('periodoBanner').style.display = 'flex';
+    document.getElementById('lastUpdate').textContent = `ACTUALIZADO ${hoy.toLocaleTimeString('es-MX')}`;
+    document.getElementById('footerTs').textContent = `FETCH: ${hoy.toLocaleString('es-MX')}`;
     applyFilters();
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     const eb = document.getElementById('error-banner');
     eb.style.display = 'block';
-    document.getElementById('error-detail').textContent = ` — ${e.message}`;
-    console.error(e);
+    document.getElementById('error-detail').textContent = e.message;
   }
 }
 
-// ─── FILTERS ─────────────────────────────────────────────────────────────────
+// ── FILTERS ───────────────────────────────────────────────────────────────────
 function applyFilters() {
   const planta = document.getElementById('filterPlanta').value;
-  const mes = document.getElementById('filterMes').value;
-  filtDiarios = rawDiarios.filter(r => r.planta === planta || !r.planta);
-  filtDevoluciones = rawDevoluciones.filter(r => r.planta === planta || !r.planta);
-  if (mes !== 'all') {
-    const m = parseInt(mes);
-    filtDiarios = filtDiarios.filter(r => r.mes === m);
-    filtDevoluciones = filtDevoluciones.filter(r => r.mes === m);
-  }
-  renderAll();
+  const anio   = parseInt(document.getElementById('filterAnio').value);
+  const mes    = parseInt(document.getElementById('filterMes').value);
+
+  // Corte: si es el mes/año actual → hasta hoy; si es pasado → hasta último día del mes
+  const esActual = (anio === anioActual && mes === mesActual);
+  const corte    = esActual ? diaCorte : 31; // 31 atrapa todos los días
+
+  // Mes anterior
+  const mesPrevNum  = mes === 1 ? 12 : mes - 1;
+  const anioPrev    = mes === 1 ? anio - 1 : anio;
+  // Año anterior mismo mes
+  const anioAntNum  = anio - 1;
+
+  // Update banner
+  document.getElementById('pBanner').textContent    = `${MESES[mes]} ${anio}`;
+  document.getElementById('pCorte').textContent     = `Día ${corte}${esActual?' (hoy)':''}`;
+  document.getElementById('pCompMes').textContent   = `${MESES[mesPrevNum]} ${anioPrev} (día ${corte})`;
+  document.getElementById('pCompAnio').textContent  = `${MESES[mes]} ${anioAntNum} (día ${corte})`;
+
+  // Filter datasets
+  const filtro = r => r.planta === planta || !r.planta;
+
+  const dActual   = rawDiarios.filter(r => filtro(r) && r.anio===anio   && r.mes===mes        && r.dia<=corte);
+  const dMesPrev  = rawDiarios.filter(r => filtro(r) && r.anio===anioPrev && r.mes===mesPrevNum && r.dia<=corte);
+  const dAnioPrev = rawDiarios.filter(r => filtro(r) && r.anio===anioAntNum && r.mes===mes     && r.dia<=corte);
+  const devActual = rawDevoluciones.filter(r => filtro(r) && r.anio===anio && r.mes===mes && r.dia<=corte);
+
+  const meta = rawMetas.find(m => m.mes === mes) || { metaTons:0, metaM2:0, metaMerma:META_MERMA, diasLab:0 };
+
+  renderAll({ dActual, dMesPrev, dAnioPrev, devActual, meta, mes, anio, corte, mesPrevNum, anioPrev, anioAntNum });
 }
 
-// ─── RENDER ALL ───────────────────────────────────────────────────────────────
-function renderAll() {
-  renderKPIs();
-  renderKPIMerma();
-  renderKPIDevol();
-  renderChartTons();
-  renderChartM2();
-  renderChartMeta();
-  renderChartDias();
-  renderChartMermaLinea();
-  renderChartMermaMes();
-  renderChartMermaPct();
-  renderChartDevolDepto();
-  renderChartDevolCliente();
-  renderTablaDevoluciones();
-  renderTabla();
-}
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const sum  = (arr, k) => arr.reduce((a,r) => a+(r[k]||0), 0);
+const fmt  = (n, d=0) => isNaN(n) ? '—' : n.toLocaleString('es-MX',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtD = d => d.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+const pct  = (a, b) => b > 0 ? (a/b*100) : 0;
+const delta = (now, prev) => {
+  if (prev === 0) return { txt:'—', cls:'neu' };
+  const d = ((now-prev)/Math.abs(prev)*100);
+  return { txt: `${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%`, cls: d>=0?'pos':'neg' };
+};
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-function sum(arr, key) { return arr.reduce((a,r) => a + (r[key]||0), 0); }
-function fmt(n, dec=0) { return n.toLocaleString('es-MX', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
-function fmtDate(d) { return d.toLocaleDateString('es-MX', {day:'2-digit', month:'2-digit', year:'numeric'}); }
+function destroyChart(id) { if (CHARTS[id]) { CHARTS[id].destroy(); delete CHARTS[id]; } }
 
-function getMeta(mes) {
-  return rawMetas.find(m => m.mes === mes) || {metaTons:0, metaM2:0, metaMerma:META_MERMA, diasLab:0};
-}
-
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-}
-
-// ─── KPI PRODUCCIÓN ───────────────────────────────────────────────────────────
-function renderKPIs() {
-  const totalEmb = sum(filtDiarios, 'tonEmb');
-  const totalProd = sum(filtDiarios, 'tonProd');
-  const totalM2 = sum(filtDiarios, 'm2');
-  const diasProd = filtDiarios.filter(r => r.tonProd > 0).length;
-  const diasTotal = filtDiarios.length;
-
-  // Meta acumulada según meses filtrados
-  const meses = [...new Set(filtDiarios.map(r=>r.mes))];
-  const metaTotalTons = meses.reduce((a,m) => a + getMeta(m).metaTons, 0);
-  const pctMeta = metaTotalTons > 0 ? (totalEmb / metaTotalTons * 100) : null;
-  const eficiencia = totalProd > 0 ? (totalEmb / totalProd * 100) : 0;
-
-  const kpis = [
-    {
-      label: 'Tons Embarcadas', value: fmt(totalEmb), unit: 'toneladas',
-      meta: pctMeta !== null ? `${fmt(pctMeta,1)}% de meta (${fmt(metaTotalTons)} ton)` : 'Sin meta definida',
-      pct: pctMeta, color: pctMeta >= 90 ? '' : pctMeta >= 70 ? 'warn' : 'danger'
-    },
-    {
-      label: 'Tons Producidas', value: fmt(totalProd), unit: 'toneladas',
-      meta: `Eficiencia embarque: ${fmt(eficiencia,1)}%`,
-      pct: eficiencia, color: eficiencia >= 80 ? '' : 'warn'
-    },
-    {
-      label: 'm² Producidos', value: fmt(totalM2/1000,0), unit: 'miles de m²',
-      meta: `${fmt(totalM2)} m² total`, pct: null, color: 'blue'
-    },
-    {
-      label: 'Días Productivos', value: diasProd, unit: `de ${diasTotal} días registrados`,
-      meta: `${fmt(diasProd/diasTotal*100,1)}% uptime`, pct: diasProd/diasTotal*100,
-      color: diasProd/diasTotal >= 0.8 ? '' : 'warn'
-    }
-  ];
-
-  document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
-    <div class="kpi-card ${k.color}">
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value">${k.value}</div>
-      <div class="kpi-unit">${k.unit}</div>
-      ${k.pct !== null ? `<div class="progress-track"><div class="progress-fill ${k.color}" style="width:${Math.min(k.pct,100)}%"></div></div>` : ''}
-      <div class="kpi-meta"><span class="${k.color==='danger'?'badge-down':k.color==='warn'?'badge-warn':'badge-up'}">${k.meta}</span></div>
-    </div>
-  `).join('');
-}
-
-// ─── KPI MERMA ────────────────────────────────────────────────────────────────
-function renderKPIMerma() {
-  const mermaTrim = sum(filtDiarios, 'mermaTrim');
-  const mermaProc = sum(filtDiarios, 'mermaProc');
-  const mermaTotal = mermaTrim + mermaProc;
-  const tonProd = sum(filtDiarios, 'tonProd');
-  const pctMerma = tonProd > 0 ? (mermaTotal / 1000 / tonProd * 100) : 0;
-  const metaMerma = META_MERMA * 100;
-  const diff = pctMerma - metaMerma;
-
-  document.getElementById('kpiMerma').innerHTML = `
-    <div class="kpi-card ${pctMerma <= metaMerma ? '' : 'danger'}">
-      <div class="kpi-label">% Merma Total</div>
-      <div class="kpi-value">${fmt(pctMerma,2)}</div>
-      <div class="kpi-unit">% sobre producción</div>
-      <div class="progress-track"><div class="progress-fill ${pctMerma<=metaMerma?'':'danger'}" style="width:${Math.min(pctMerma/metaMerma*100,150)}%"></div></div>
-      <div class="kpi-meta"><span class="${diff>0?'badge-down':'badge-up'}">${diff>0?'▲':'▼'} ${fmt(Math.abs(diff),2)}% vs meta ${metaMerma}%</span></div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">Merma Trim (kg)</div>
-      <div class="kpi-value">${fmt(mermaTrim/1000,1)}</div>
-      <div class="kpi-unit">toneladas (cortes de borde)</div>
-      <div class="kpi-meta"><span class="badge-warn">${fmt(mermaTrim)} kg acumulado</span></div>
-    </div>
-    <div class="kpi-card warn">
-      <div class="kpi-label">Merma Proceso (kg)</div>
-      <div class="kpi-value">${fmt(mermaProc/1000,1)}</div>
-      <div class="kpi-unit">toneladas (proceso)</div>
-      <div class="kpi-meta"><span class="badge-warn">${fmt(mermaProc)} kg acumulado</span></div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Merma Total</div>
-      <div class="kpi-value">${fmt(mermaTotal/1000,1)}</div>
-      <div class="kpi-unit">toneladas perdidas</div>
-      <div class="kpi-meta"><span class="badge-up">${fmt(mermaTotal)} kg total</span></div>
-    </div>
-  `;
-}
-
-// ─── KPI DEVOLUCIONES ─────────────────────────────────────────────────────────
-function renderKPIDevol() {
-  const total = filtDevoluciones.length;
-  const piezas = sum(filtDevoluciones, 'piezas');
-  const importe = sum(filtDevoluciones, 'importe');
-  const clientes = new Set(filtDevoluciones.map(r=>r.cliente)).size;
-
-  document.getElementById('kpiDevol').innerHTML = `
-    <div class="kpi-card danger">
-      <div class="kpi-label">Total Devoluciones</div>
-      <div class="kpi-value">${total}</div>
-      <div class="kpi-unit">registros</div>
-    </div>
-    <div class="kpi-card warn">
-      <div class="kpi-label">Piezas Devueltas</div>
-      <div class="kpi-value">${fmt(piezas)}</div>
-      <div class="kpi-unit">piezas</div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">Importe Involucrado</div>
-      <div class="kpi-value">$${fmt(importe/1000,0)}k</div>
-      <div class="kpi-unit">MXN (estimado)</div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Clientes Afectados</div>
-      <div class="kpi-value">${clientes}</div>
-      <div class="kpi-unit">clientes únicos</div>
-    </div>
-  `;
-  document.getElementById('totalDevol').textContent = `${total} registros`;
-}
-
-// ─── CHART: TONS DIARIO ───────────────────────────────────────────────────────
-function renderChartTons() {
-  destroyChart('chartTons');
-  const dias = filtDiarios.filter(r=>r.tonProd>0||r.tonEmb>0).slice(-60);
-  const labels = dias.map(r => `${r.dia}/${r.mes}`);
-  charts.chartTons = new Chart(document.getElementById('chartTons'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Embarcadas',
-          data: dias.map(r=>r.tonEmb),
-          borderColor: '#00e5a0', backgroundColor: 'rgba(0,229,160,0.08)',
-          borderWidth: 2, pointRadius: 2, tension: 0.3, fill: true
-        },
-        {
-          label: 'Producidas',
-          data: dias.map(r=>r.tonProd),
-          borderColor: '#4d9fff', backgroundColor: 'rgba(77,159,255,0.05)',
-          borderWidth: 1.5, pointRadius: 2, tension: 0.3, borderDash: [4,4]
-        }
-      ]
-    },
-    options: chartOpts('kg')
-  });
-}
-
-// ─── CHART: M2 POR MES ────────────────────────────────────────────────────────
-function renderChartM2() {
-  destroyChart('chartM2');
-  const byMes = {};
-  filtDiarios.forEach(r => { byMes[r.mes] = (byMes[r.mes]||0) + r.m2; });
-  const labels = Object.keys(byMes).map(m => MESES_SHORT[m]);
-  const data = Object.values(byMes).map(v => v/1000);
-  charts.chartM2 = new Chart(document.getElementById('chartM2'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'm² (miles)',
-        data,
-        backgroundColor: 'rgba(77,159,255,0.7)',
-        borderColor: '#4d9fff',
-        borderWidth: 1
-      }]
-    },
-    options: chartOpts('miles m²')
-  });
-}
-
-// ─── CHART: META MENSUAL ──────────────────────────────────────────────────────
-function renderChartMeta() {
-  destroyChart('chartMeta');
-  const meses = [...new Set(rawDiarios.filter(r=>r.planta==='Tolcayuca'||!r.planta).map(r=>r.mes))].sort();
-  const labels = meses.map(m => MESES_SHORT[m]);
-  const real = meses.map(m => {
-    return sum(rawDiarios.filter(r=>(r.planta==='Tolcayuca'||!r.planta)&&r.mes===m), 'tonEmb');
-  });
-  const meta = meses.map(m => getMeta(m).metaTons);
-  charts.chartMeta = new Chart(document.getElementById('chartMeta'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Real', data: real, backgroundColor: 'rgba(0,229,160,0.7)', borderColor: '#00e5a0', borderWidth: 1 },
-        { label: 'Meta', data: meta, backgroundColor: 'rgba(255,71,87,0.15)', borderColor: '#ff4757', borderWidth: 2, type: 'line', pointRadius: 4, tension: 0 }
-      ]
-    },
-    options: chartOpts('ton')
-  });
-}
-
-// ─── CHART: DÍAS DONA ─────────────────────────────────────────────────────────
-function renderChartDias() {
-  destroyChart('chartDias');
-  const prod = filtDiarios.filter(r=>r.tonProd>0).length;
-  const paro = filtDiarios.filter(r=>r.tonProd===0).length;
-  charts.chartDias = new Chart(document.getElementById('chartDias'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Productivos', 'Paros/Domingos'],
-      datasets: [{ data: [prod, paro], backgroundColor: ['#00e5a0','#1e2330'], borderColor: ['#00e5a0','#2a3040'], borderWidth: 2 }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#8892a4', font: { family: 'IBM Plex Mono', size: 11 } } } }
-    }
-  });
-}
-
-// ─── CHART: MERMA LINEA ───────────────────────────────────────────────────────
-function renderChartMermaLinea() {
-  destroyChart('chartMermaLinea');
-  const dias = filtDiarios.filter(r=>r.mermaTotal>0).slice(-60);
-  charts.chartMermaLinea = new Chart(document.getElementById('chartMermaLinea'), {
-    type: 'line',
-    data: {
-      labels: dias.map(r=>`${r.dia}/${r.mes}`),
-      datasets: [
-        { label: 'Trim (kg)', data: dias.map(r=>r.mermaTrim), borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.1)', borderWidth:2, fill:true, tension:0.3, pointRadius:2 },
-        { label: 'Proceso (kg)', data: dias.map(r=>r.mermaProc), borderColor:'#ffd166', backgroundColor:'rgba(255,209,102,0.05)', borderWidth:1.5, fill:true, tension:0.3, pointRadius:2 }
-      ]
-    },
-    options: chartOpts('kg')
-  });
-}
-
-// ─── CHART: MERMA POR MES ─────────────────────────────────────────────────────
-function renderChartMermaMes() {
-  destroyChart('chartMermaMes');
-  const meses = [...new Set(filtDiarios.map(r=>r.mes))].sort();
-  charts.chartMermaMes = new Chart(document.getElementById('chartMermaMes'), {
-    type: 'bar',
-    data: {
-      labels: meses.map(m=>MESES_SHORT[m]),
-      datasets: [
-        { label: 'Trim', data: meses.map(m=>sum(filtDiarios.filter(r=>r.mes===m),'mermaTrim')), backgroundColor:'rgba(255,107,53,0.7)', stack:'a' },
-        { label: 'Proceso', data: meses.map(m=>sum(filtDiarios.filter(r=>r.mes===m),'mermaProc')), backgroundColor:'rgba(255,209,102,0.7)', stack:'a' }
-      ]
-    },
-    options: { ...chartOpts('kg'), scales: { ...chartOpts('kg').scales, x: { stacked: true, ...chartOpts('kg').scales?.x }, y: { stacked: true, ...chartOpts('kg').scales?.y } } }
-  });
-}
-
-// ─── CHART: % MERMA TENDENCIA ─────────────────────────────────────────────────
-function renderChartMermaPct() {
-  destroyChart('chartMermaPct');
-  const meses = [...new Set(filtDiarios.map(r=>r.mes))].sort();
-  const pcts = meses.map(m => {
-    const d = filtDiarios.filter(r=>r.mes===m);
-    const merma = sum(d,'mermaTotal');
-    const prod = sum(d,'tonProd') * 1000;
-    return prod > 0 ? merma/prod*100 : 0;
-  });
-  charts.chartMermaPct = new Chart(document.getElementById('chartMermaPct'), {
-    type: 'line',
-    data: {
-      labels: meses.map(m=>MESES_SHORT[m]),
-      datasets: [
-        { label: '% Merma Real', data: pcts, borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.1)', borderWidth:2, tension:0.3, fill:true, pointRadius:5 },
-        { label: 'Meta 10.5%', data: meses.map(()=>10.5), borderColor:'#ff4757', borderWidth:1.5, borderDash:[6,4], pointRadius:0 }
-      ]
-    },
-    options: chartOpts('%')
-  });
-}
-
-// ─── CHART: DEVOL DEPTO ───────────────────────────────────────────────────────
-function renderChartDevolDepto() {
-  destroyChart('chartDevolDepto');
-  const byDepto = {};
-  filtDevoluciones.forEach(r => { byDepto[r.responsable] = (byDepto[r.responsable]||0) + 1; });
-  const sorted = Object.entries(byDepto).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const colors = ['#ff4757','#ff6b35','#ffd166','#4d9fff','#00e5a0','#a855f7','#06b6d4','#f43f5e'];
-  charts.chartDevolDepto = new Chart(document.getElementById('chartDevolDepto'), {
-    type: 'doughnut',
-    data: {
-      labels: sorted.map(e=>e[0]),
-      datasets: [{ data: sorted.map(e=>e[1]), backgroundColor: colors, borderColor:'#0a0c0f', borderWidth:3 }]
-    },
-    options: { responsive: true, plugins: { legend: { position:'bottom', labels: { color:'#8892a4', font:{family:'IBM Plex Mono',size:10}, boxWidth:12, padding:10 } } } }
-  });
-}
-
-// ─── CHART: DEVOL CLIENTE ─────────────────────────────────────────────────────
-function renderChartDevolCliente() {
-  destroyChart('chartDevolCliente');
-  const byCliente = {};
-  filtDevoluciones.forEach(r => { byCliente[r.cliente] = (byCliente[r.cliente]||0) + r.piezas; });
-  const sorted = Object.entries(byCliente).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  charts.chartDevolCliente = new Chart(document.getElementById('chartDevolCliente'), {
-    type: 'bar',
-    data: {
-      labels: sorted.map(e => e[0].length > 18 ? e[0].substring(0,18)+'…' : e[0]),
-      datasets: [{ label: 'Piezas', data: sorted.map(e=>e[1]), backgroundColor:'rgba(255,71,87,0.7)', borderColor:'#ff4757', borderWidth:1 }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color:'#5a6070', font:{family:'IBM Plex Mono',size:10} }, grid: { color:'rgba(30,35,48,0.6)' } },
-        y: { ticks: { color:'#8892a4', font:{family:'IBM Plex Mono',size:9} }, grid: { display: false } }
-      }
-    }
-  });
-}
-
-// ─── TABLA DEVOLUCIONES ───────────────────────────────────────────────────────
-function renderTablaDevoluciones() {
-  const tbody = document.getElementById('tablaDevoluciones');
-  const rows = filtDevoluciones.slice(-30).reverse();
-  tbody.innerHTML = rows.map(r => `
-    <tr>
-      <td class="highlight">${fmtDate(r.fecha)}</td>
-      <td>${r.cliente.length>22?r.cliente.substring(0,22)+'…':r.cliente}</td>
-      <td class="accent">${r.pedido}</td>
-      <td><span class="merma-chip ${chipClass(r.responsable)}">${r.responsable}</span></td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${r.motivo}</td>
-      <td class="highlight">${fmt(r.piezas)}</td>
-    </tr>
-  `).join('');
-}
-
-function chipClass(resp) {
-  const r = (resp||'').toUpperCase();
-  if (r.includes('CALIDAD')) return 'chip-bad';
-  if (r.includes('CLIENTE')) return 'chip-warn';
-  if (r.includes('TRANSPORTE')||r.includes('TRAYECTO')) return 'chip-warn';
-  return 'chip-ok';
-}
-
-// ─── TABLA PRODUCCIÓN ─────────────────────────────────────────────────────────
-function renderTabla() {
-  const mes = document.getElementById('mesTabla').value;
-  let rows = rawDiarios.filter(r=>r.planta==='Tolcayuca'||!r.planta);
-  if (mes !== 'all') rows = rows.filter(r=>r.mes===parseInt(mes));
-  rows = rows.sort((a,b)=>b.fecha-a.fecha);
-
-  const tbody = document.getElementById('tablaProduccion');
-  tbody.innerHTML = rows.map(r => {
-    const pct = r.tonProd > 0 ? (r.mermaTotal / (r.tonProd*10)) : 0;
-    const chip = pct <= 10.5 ? 'chip-ok' : pct <= 15 ? 'chip-warn' : 'chip-bad';
-    const isParo = r.tonProd === 0;
-    return `<tr>
-      <td class="highlight">${fmtDate(r.fecha)}</td>
-      <td class="${isParo?'':'accent'}">${isParo?'<span style="color:#2a3040">—</span>':fmt(r.tonEmb)}</td>
-      <td>${isParo?'<span style="color:#2a3040">PARO</span>':fmt(r.tonProd)}</td>
-      <td>${isParo?'—':fmt(r.m2,0)}</td>
-      <td>${isParo?'—':fmt(r.mermaTrim,0)}</td>
-      <td>${isParo?'—':fmt(r.mermaProc,0)}</td>
-      <td class="warn">${isParo?'—':fmt(r.mermaTotal,0)}</td>
-      <td>${isParo?'—':`<span class="merma-chip ${chip}">${fmt(pct,1)}%</span>`}</td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:var(--text-muted);">${r.obs||''}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ─── TABS ─────────────────────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    const tabs = ['produccion','merma','devoluciones','diario'];
-    b.classList.toggle('active', tabs[i]===name);
-  });
-  document.querySelectorAll('.tab-panel').forEach(p => {
-    p.classList.toggle('active', p.id===`tab-${name}`);
-  });
-}
-
-// ─── CHART DEFAULTS ───────────────────────────────────────────────────────────
-function chartOpts(unit='') {
+function chartBase(unit='') {
   return {
-    responsive: true,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { labels: { color:'#8892a4', font:{family:'IBM Plex Mono',size:10}, boxWidth:12 } },
-      tooltip: {
-        backgroundColor:'#111318', borderColor:'#1e2330', borderWidth:1,
-        titleColor:'#e8eaf0', bodyColor:'#8892a4',
-        titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono',size:11}
-      }
+    responsive:true,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{labels:{color:'#8892a4',font:{family:'IBM Plex Mono',size:10},boxWidth:10}},
+      tooltip:{backgroundColor:'#111318',borderColor:'#1e2330',borderWidth:1,titleColor:'#e8eaf0',bodyColor:'#8892a4',titleFont:{family:'IBM Plex Mono'},bodyFont:{family:'IBM Plex Mono',size:10}}
     },
-    scales: {
-      x: { ticks:{color:'#5a6070',font:{family:'IBM Plex Mono',size:10}}, grid:{color:'rgba(30,35,48,0.6)'} },
-      y: { ticks:{color:'#5a6070',font:{family:'IBM Plex Mono',size:10}}, grid:{color:'rgba(30,35,48,0.6)'} }
+    scales:{
+      x:{ticks:{color:'#5a6070',font:{family:'IBM Plex Mono',size:9}},grid:{color:'rgba(30,35,48,0.5)'}},
+      y:{ticks:{color:'#5a6070',font:{family:'IBM Plex Mono',size:9}},grid:{color:'rgba(30,35,48,0.5)'}}
     }
   };
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ── RENDER ALL ────────────────────────────────────────────────────────────────
+function renderAll(ctx) {
+  renderKPIs(ctx);
+  renderComp(ctx);
+  renderChartAcum(ctx);
+  renderChartMeta(ctx);
+  renderChartComparoDia(ctx);
+  renderChartDias(ctx);
+  renderKPIMerma(ctx);
+  renderCompMerma(ctx);
+  renderChartMermaLinea(ctx);
+  renderChartMermaPct(ctx);
+  renderKPIDevol(ctx);
+  renderChartDevolDepto(ctx);
+  renderChartDevolCliente(ctx);
+  renderTablaDevol(ctx);
+  renderTablaProduccion(ctx);
+}
+
+// ── KPIs PRODUCCIÓN ───────────────────────────────────────────────────────────
+function renderKPIs({ dActual, meta, corte }) {
+  const tonEmb  = sum(dActual,'tonEmb');
+  const tonProd = sum(dActual,'tonProd');
+  const m2      = sum(dActual,'m2');
+  const diasProd= dActual.filter(r=>r.tonProd>0).length;
+  const diasTot = dActual.length;
+
+  // Meta prorateada al día de corte
+  const metaPro = meta.diasLab > 0 ? (meta.metaTons / meta.diasLab * diasProd) : meta.metaTons;
+  const pctMeta = pct(tonEmb, meta.metaTons);
+  const efic    = pct(tonEmb, tonProd);
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card ${pctMeta>=90?'':'pctMeta>=70?warn:danger'}">
+      <div class="kpi-label">Tons Embarcadas</div>
+      <div class="kpi-value">${fmt(tonEmb)}</div>
+      <div class="kpi-unit">kg acumulados</div>
+      <div class="progress-track"><div class="progress-fill ${pctMeta>=90?'':'pctMeta>=70?warn:danger'}" style="width:${Math.min(pctMeta,100)}%"></div></div>
+      <div class="kpi-meta ${pctMeta>=90?'up':'down'}">${fmt(pctMeta,1)}% de meta mensual (${fmt(meta.metaTons)} kg)</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Tons Producidas</div>
+      <div class="kpi-value">${fmt(tonProd)}</div>
+      <div class="kpi-unit">kg producidos</div>
+      <div class="kpi-meta neutral">Eficiencia embarque: ${fmt(efic,1)}%</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">m² Producidos</div>
+      <div class="kpi-value">${fmt(m2/1000,0)}</div>
+      <div class="kpi-unit">miles de m²</div>
+      <div class="kpi-meta neutral">${fmt(m2)} m² total</div>
+    </div>
+    <div class="kpi-card ${diasProd/diasTot>=0.8?'':'warn'}">
+      <div class="kpi-label">Días Productivos</div>
+      <div class="kpi-value">${diasProd}</div>
+      <div class="kpi-unit">de ${diasTot} días (corte día ${corte})</div>
+      <div class="kpi-meta ${diasProd/diasTot>=0.8?'up':'down'}">${fmt(pct(diasProd,diasTot),1)}% uptime</div>
+    </div>`;
+}
+
+// ── COMPARATIVO PRODUCCIÓN ────────────────────────────────────────────────────
+function renderComp({ dActual, dMesPrev, dAnioPrev, meta, mes, anio, mesPrevNum, anioPrev, anioAntNum }) {
+  const metrics = [
+    { label:'Tons Embarcadas', key:'tonEmb', unit:'kg' },
+    { label:'Tons Producidas', key:'tonProd', unit:'kg' },
+    { label:'m² Producidos',   key:'m2',     unit:'m²' }
+  ];
+
+  const block = (title, dComp, label) => `
+    <div class="comp-card">
+      <div class="comp-title">${title}</div>
+      ${metrics.map(m => {
+        const now  = sum(dActual, m.key);
+        const prev = sum(dComp,   m.key);
+        const d    = delta(now, prev);
+        return `<div class="comp-row">
+          <span class="comp-metric">${m.label}</span>
+          <div class="comp-vals">
+            <span class="comp-now">${fmt(now)}</span>
+            <span class="comp-prev">vs ${fmt(prev)}</span>
+            <span class="delta ${d.cls}">${d.txt}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  document.getElementById('compGrid').innerHTML =
+    block(`vs Meta — ${MESES[mes]} ${anio}`, [], '') // placeholder, handled separately below
+    .replace('<div class="comp-card">', `<div class="comp-card" style="border-color:rgba(0,229,160,0.3);">`)
+  ;
+
+  // Rebuild with meta comparison
+  const metaRows = metrics.map(m => {
+    const now   = sum(dActual, m.key);
+    const metaV = m.key==='tonEmb' ? meta.metaTons : m.key==='m2' ? meta.metaM2 : 0;
+    const d     = delta(now, metaV);
+    return `<div class="comp-row">
+      <span class="comp-metric">${m.label}</span>
+      <div class="comp-vals">
+        <span class="comp-now">${fmt(now)}</span>
+        <span class="comp-prev">meta: ${fmt(metaV)}</span>
+        <span class="delta ${d.cls}">${d.txt}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const mesPrevRows = metrics.map(m => {
+    const now  = sum(dActual,  m.key);
+    const prev = sum(dMesPrev, m.key);
+    const d    = delta(now, prev);
+    return `<div class="comp-row">
+      <span class="comp-metric">${m.label}</span>
+      <div class="comp-vals">
+        <span class="comp-now">${fmt(now)}</span>
+        <span class="comp-prev">vs ${fmt(prev)}</span>
+        <span class="delta ${d.cls}">${d.txt}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const anioRows = metrics.map(m => {
+    const now  = sum(dActual,   m.key);
+    const prev = sum(dAnioPrev, m.key);
+    const d    = delta(now, prev);
+    return `<div class="comp-row">
+      <span class="comp-metric">${m.label}</span>
+      <div class="comp-vals">
+        <span class="comp-now">${fmt(now)}</span>
+        <span class="comp-prev">vs ${fmt(prev)}</span>
+        <span class="delta ${d.cls}">${d.txt}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('compGrid').innerHTML = `
+    <div class="comp-card" style="border-color:rgba(0,229,160,0.25);">
+      <div class="comp-title">📌 vs Meta ${MESES[mes]} ${anio}</div>${metaRows}
+    </div>
+    <div class="comp-card" style="border-color:rgba(255,209,102,0.2);">
+      <div class="comp-title">📅 vs ${MESES[mesPrevNum]} ${anioPrev} (mismo corte)</div>${mesPrevRows}
+    </div>
+    <div class="comp-card" style="border-color:rgba(77,159,255,0.2);">
+      <div class="comp-title">📆 vs ${MESES[mes]} ${anioAntNum} (mismo corte)</div>${anioRows}
+    </div>`;
+}
+
+// ── CHART ACUMULADO ───────────────────────────────────────────────────────────
+function renderChartAcum({ dActual, dMesPrev, dAnioPrev, mesPrevNum, anioPrev, anioAntNum, mes, anio }) {
+  destroyChart('chartAcum');
+  const dias = [...Array(31)].map((_,i)=>i+1);
+  const acum = (arr, k) => {
+    let s=0;
+    return dias.map(d => {
+      const r = arr.find(x=>x.dia===d);
+      if (r) s += r[k]||0;
+      return r!==undefined ? s : null;
+    });
+  };
+  const trimNull = arr => { let last=0; arr.forEach((v,i)=>{ if(v!==null) last=i; }); return arr.slice(0,last+1); };
+  const aA = trimNull(acum(dActual,   'tonEmb'));
+  const aP = trimNull(acum(dMesPrev,  'tonEmb'));
+  const aY = trimNull(acum(dAnioPrev, 'tonEmb'));
+  const labels = dias.slice(0, Math.max(aA.length, aP.length, aY.length)).map(d=>`Día ${d}`);
+
+  CHARTS.chartAcum = new Chart(document.getElementById('chartAcum'), {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:`${MESES[mes]} ${anio}`,              data:aA, borderColor:'#00e5a0', backgroundColor:'rgba(0,229,160,0.1)',  borderWidth:2.5, pointRadius:3, tension:0.3, fill:true },
+      { label:`${MESES[mesPrevNum]} ${anioPrev}`,   data:aP, borderColor:'#ffd166', backgroundColor:'rgba(255,209,102,0.05)', borderWidth:1.5, pointRadius:2, tension:0.3, borderDash:[4,4] },
+      { label:`${MESES[mes]} ${anioAntNum}`,        data:aY, borderColor:'#4d9fff', backgroundColor:'rgba(77,159,255,0.05)', borderWidth:1.5, pointRadius:2, tension:0.3, borderDash:[4,4] }
+    ]},
+    options: chartBase('kg')
+  });
+}
+
+// ── CHART META DONA ───────────────────────────────────────────────────────────
+function renderChartMeta({ dActual, meta }) {
+  destroyChart('chartMeta');
+  const real = sum(dActual,'tonEmb');
+  const rest = Math.max(meta.metaTons - real, 0);
+  CHARTS.chartMeta = new Chart(document.getElementById('chartMeta'), {
+    type:'doughnut',
+    data:{ labels:['Embarcado','Pendiente'],
+      datasets:[{ data:[real, rest], backgroundColor:['#00e5a0','#1e2330'], borderColor:['#00e5a0','#2a3040'], borderWidth:2 }]
+    },
+    options:{ responsive:true, plugins:{
+      legend:{labels:{color:'#8892a4',font:{family:'IBM Plex Mono',size:10}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmt(ctx.raw)} kg`}}
+    }}
+  });
+}
+
+// ── CHART COMPARO DIARIO ──────────────────────────────────────────────────────
+function renderChartComparoDia({ dActual, dMesPrev, mes, anio, mesPrevNum, anioPrev }) {
+  destroyChart('chartComparoDia');
+  const dias = [...new Set([...dActual,...dMesPrev].map(r=>r.dia))].sort((a,b)=>a-b);
+  const getVal = (arr, dia) => { const r=arr.find(x=>x.dia===dia); return r ? r.tonEmb : 0; };
+  CHARTS.chartComparoDia = new Chart(document.getElementById('chartComparoDia'), {
+    type:'bar',
+    data:{ labels: dias.map(d=>`D${d}`), datasets:[
+      { label:`${MESES[mes].substring(0,3)} ${anio}`,        data:dias.map(d=>getVal(dActual,d)),  backgroundColor:'rgba(0,229,160,0.7)',  borderColor:'#00e5a0',  borderWidth:1 },
+      { label:`${MESES[mesPrevNum].substring(0,3)} ${anioPrev}`, data:dias.map(d=>getVal(dMesPrev,d)), backgroundColor:'rgba(255,209,102,0.4)', borderColor:'#ffd166', borderWidth:1 }
+    ]},
+    options: chartBase('kg')
+  });
+}
+
+// ── CHART DÍAS ────────────────────────────────────────────────────────────────
+function renderChartDias({ dActual }) {
+  destroyChart('chartDias');
+  const prod = dActual.filter(r=>r.tonProd>0).length;
+  const paro = dActual.filter(r=>r.tonProd===0).length;
+  CHARTS.chartDias = new Chart(document.getElementById('chartDias'), {
+    type:'doughnut',
+    data:{ labels:['Productivos','Paros/Domingos'],
+      datasets:[{ data:[prod,paro], backgroundColor:['#00e5a0','#1e2330'], borderColor:['#00e5a0','#2a3040'], borderWidth:2 }]
+    },
+    options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#8892a4',font:{family:'IBM Plex Mono',size:10} } } } }
+  });
+}
+
+// ── KPI MERMA ─────────────────────────────────────────────────────────────────
+function renderKPIMerma({ dActual, meta }) {
+  const trim  = sum(dActual,'mermaTrim');
+  const proc  = sum(dActual,'mermaProc');
+  const total = trim + proc;
+  const prod  = sum(dActual,'tonProd');
+  const pctM  = prod>0 ? total/(prod*10) : 0; // kg/kg → %
+  const metaM = (meta.metaMerma||META_MERMA)*100;
+  const diff  = pctM - metaM;
+  document.getElementById('kpiMerma').innerHTML = `
+    <div class="kpi-card ${pctM<=metaM?'':'danger'}">
+      <div class="kpi-label">% Merma Total</div>
+      <div class="kpi-value">${fmt(pctM,2)}</div>
+      <div class="kpi-unit">% sobre producción</div>
+      <div class="progress-track"><div class="progress-fill ${pctM<=metaM?'':'danger'}" style="width:${Math.min(pctM/metaM*100,150)}%"></div></div>
+      <div class="kpi-meta ${diff>0?'down':'up'}">${diff>0?'▲':'▼'} ${fmt(Math.abs(diff),2)}% vs meta ${fmt(metaM,1)}%</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">Merma Trim</div>
+      <div class="kpi-value">${fmt(trim/1000,1)}</div>
+      <div class="kpi-unit">toneladas</div>
+      <div class="kpi-meta neutral">${fmt(trim)} kg</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-label">Merma Proceso</div>
+      <div class="kpi-value">${fmt(proc/1000,1)}</div>
+      <div class="kpi-unit">toneladas</div>
+      <div class="kpi-meta neutral">${fmt(proc)} kg</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Merma Total</div>
+      <div class="kpi-value">${fmt(total/1000,1)}</div>
+      <div class="kpi-unit">toneladas perdidas</div>
+      <div class="kpi-meta neutral">${fmt(total)} kg</div>
+    </div>`;
+}
+
+// ── COMP MERMA ────────────────────────────────────────────────────────────────
+function renderCompMerma({ dActual, dMesPrev, dAnioPrev, meta, mes, anio, mesPrevNum, anioPrev, anioAntNum }) {
+  const mermaKg = arr => sum(arr,'mermaTrim')+sum(arr,'mermaProc');
+  const mermaPct= arr => { const p=sum(arr,'tonProd'); return p>0 ? mermaKg(arr)/(p*10) : 0; };
+
+  const now = mermaPct(dActual);
+  const prev= mermaPct(dMesPrev);
+  const yr  = mermaPct(dAnioPrev);
+  const metaM=(meta.metaMerma||META_MERMA)*100;
+
+  const dMeta = delta(now*-1, metaM*-1); // invertido: menor merma = positivo
+  const dPrev = delta(now*-1, prev*-1);
+  const dYr   = delta(now*-1, yr*-1);
+
+  const row = (label, val, comp, d, compLabel) => `
+    <div class="comp-row">
+      <span class="comp-metric">${label}</span>
+      <div class="comp-vals">
+        <span class="comp-now">${fmt(val,2)}%</span>
+        <span class="comp-prev">${compLabel}: ${fmt(comp,2)}%</span>
+        <span class="delta ${d.cls}">${d.txt}</span>
+      </div>
+    </div>`;
+
+  document.getElementById('compMerma').innerHTML = `
+    <div class="comp-card" style="border-color:rgba(0,229,160,0.25);">
+      <div class="comp-title">📌 vs Meta ${MESES[mes]} ${anio}</div>
+      ${row('% Merma', now, metaM, dMeta, 'meta')}
+      ${row('Trim kg', sum(dActual,'mermaTrim'), 0, {txt:'—',cls:'neu'}, '—')}
+      ${row('Proc kg', sum(dActual,'mermaProc'), 0, {txt:'—',cls:'neu'}, '—')}
+    </div>
+    <div class="comp-card" style="border-color:rgba(255,209,102,0.2);">
+      <div class="comp-title">📅 vs ${MESES[mesPrevNum]} ${anioPrev} (mismo corte)</div>
+      ${row('% Merma',  now,  prev, dPrev, 'ant')}
+      ${row('Trim kg',  sum(dActual,'mermaTrim'), sum(dMesPrev,'mermaTrim'), delta(sum(dActual,'mermaTrim')*-1, sum(dMesPrev,'mermaTrim')*-1), 'ant')}
+      ${row('Proc kg',  sum(dActual,'mermaProc'), sum(dMesPrev,'mermaProc'), delta(sum(dActual,'mermaProc')*-1, sum(dMesPrev,'mermaProc')*-1), 'ant')}
+    </div>
+    <div class="comp-card" style="border-color:rgba(77,159,255,0.2);">
+      <div class="comp-title">📆 vs ${MESES[mes]} ${anioAntNum} (mismo corte)</div>
+      ${row('% Merma',  now,  yr, dYr, 'ant')}
+      ${row('Trim kg',  sum(dActual,'mermaTrim'), sum(dAnioPrev,'mermaTrim'), delta(sum(dActual,'mermaTrim')*-1, sum(dAnioPrev,'mermaTrim')*-1), 'ant')}
+      ${row('Proc kg',  sum(dActual,'mermaProc'), sum(dAnioPrev,'mermaProc'), delta(sum(dActual,'mermaProc')*-1, sum(dAnioPrev,'mermaProc')*-1), 'ant')}
+    </div>`;
+}
+
+// ── CHART MERMA LINEA ─────────────────────────────────────────────────────────
+function renderChartMermaLinea({ dActual, dMesPrev }) {
+  destroyChart('chartMermaLinea');
+  const dias = [...new Set([...dActual,...dMesPrev].map(r=>r.dia))].sort((a,b)=>a-b);
+  const g = (arr, k, dia) => { const r=arr.find(x=>x.dia===dia); return r ? (r[k]||0) : 0; };
+  CHARTS.chartMermaLinea = new Chart(document.getElementById('chartMermaLinea'), {
+    type:'line',
+    data:{ labels: dias.map(d=>`D${d}`), datasets:[
+      { label:'Trim actual', data:dias.map(d=>g(dActual,'mermaTrim',d)),  borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.1)', borderWidth:2, fill:true, tension:0.3, pointRadius:2 },
+      { label:'Proc actual', data:dias.map(d=>g(dActual,'mermaProc',d)),  borderColor:'#ffd166', backgroundColor:'rgba(255,209,102,0.05)', borderWidth:2, fill:true, tension:0.3, pointRadius:2 }
+    ]},
+    options: chartBase('kg')
+  });
+}
+
+// ── CHART MERMA PCT ───────────────────────────────────────────────────────────
+function renderChartMermaPct({ dActual, meta }) {
+  destroyChart('chartMermaPct');
+  const sorted = [...dActual].sort((a,b)=>a.dia-b.dia).filter(r=>r.tonProd>0);
+  let acumMerma=0, acumProd=0;
+  const labels=[], vals=[], metas=[];
+  sorted.forEach(r => {
+    acumMerma += (r.mermaTrim||0)+(r.mermaProc||0);
+    acumProd  += (r.tonProd||0)*10;
+    labels.push(`D${r.dia}`);
+    vals.push(acumProd>0 ? acumMerma/acumProd*100 : 0);
+    metas.push((meta.metaMerma||META_MERMA)*100);
+  });
+  CHARTS.chartMermaPct = new Chart(document.getElementById('chartMermaPct'), {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'% Merma acum.', data:vals,  borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.1)', borderWidth:2, fill:true, tension:0.3, pointRadius:3 },
+      { label:'Meta',          data:metas, borderColor:'#ff4757', borderWidth:1.5, borderDash:[6,4], pointRadius:0 }
+    ]},
+    options: chartBase('%')
+  });
+}
+
+// ── KPI DEVOLUCIONES ──────────────────────────────────────────────────────────
+function renderKPIDevol({ devActual }) {
+  const total   = devActual.length;
+  const piezas  = sum(devActual,'piezas');
+  const kilos   = sum(devActual,'kilos');
+  const clientes= new Set(devActual.map(r=>r.cliente)).size;
+  document.getElementById('kpiDevol').innerHTML = `
+    <div class="kpi-card danger"><div class="kpi-label">Total Devoluciones</div><div class="kpi-value">${total}</div><div class="kpi-unit">registros del período</div></div>
+    <div class="kpi-card warn"><div class="kpi-label">Piezas Devueltas</div><div class="kpi-value">${fmt(piezas)}</div><div class="kpi-unit">piezas</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Kilos Involucrados</div><div class="kpi-value">${fmt(kilos/1000,1)}</div><div class="kpi-unit">toneladas</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Clientes Afectados</div><div class="kpi-value">${clientes}</div><div class="kpi-unit">clientes únicos</div></div>`;
+  document.getElementById('totalDevol').textContent = `${total} registros`;
+}
+
+// ── CHART DEVOL DEPTO ─────────────────────────────────────────────────────────
+function renderChartDevolDepto({ devActual }) {
+  destroyChart('chartDevolDepto');
+  const by = {};
+  devActual.forEach(r=>{ by[r.responsable]=(by[r.responsable]||0)+1; });
+  const sorted = Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const colors = ['#ff4757','#ff6b35','#ffd166','#4d9fff','#00e5a0','#a855f7','#06b6d4','#f43f5e'];
+  CHARTS.chartDevolDepto = new Chart(document.getElementById('chartDevolDepto'), {
+    type:'doughnut',
+    data:{ labels:sorted.map(e=>e[0]), datasets:[{ data:sorted.map(e=>e[1]), backgroundColor:colors, borderColor:'#0a0c0f', borderWidth:3 }] },
+    options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:9}, boxWidth:10, padding:8 } } } }
+  });
+}
+
+// ── CHART DEVOL CLIENTE ───────────────────────────────────────────────────────
+function renderChartDevolCliente({ devActual }) {
+  destroyChart('chartDevolCliente');
+  const by = {};
+  devActual.forEach(r=>{ by[r.cliente]=(by[r.cliente]||0)+r.piezas; });
+  const sorted = Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  CHARTS.chartDevolCliente = new Chart(document.getElementById('chartDevolCliente'), {
+    type:'bar',
+    data:{ labels:sorted.map(e=>e[0].length>18?e[0].substring(0,18)+'…':e[0]),
+      datasets:[{ label:'Piezas', data:sorted.map(e=>e[1]), backgroundColor:'rgba(255,71,87,0.7)', borderColor:'#ff4757', borderWidth:1 }]
+    },
+    options:{ indexAxis:'y', responsive:true,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ticks:{color:'#5a6070',font:{family:'IBM Plex Mono',size:9}},grid:{color:'rgba(30,35,48,0.5)'}},
+        y:{ticks:{color:'#8892a4',font:{family:'IBM Plex Mono',size:9}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ── TABLA DEVOLUCIONES ────────────────────────────────────────────────────────
+function renderTablaDevol({ devActual }) {
+  const chipCls = r => {
+    const v = (r.responsable||'').toUpperCase();
+    if (v.includes('CALIDAD')) return 'chip-bad';
+    if (v.includes('CLIENTE')) return 'chip-warn';
+    return 'chip-ok';
+  };
+  document.getElementById('tablaDevoluciones').innerHTML = [...devActual].reverse().map(r=>`
+    <tr>
+      <td class="hl">${fmtD(r.fecha)}</td>
+      <td>${r.cliente.length>22?r.cliente.substring(0,22)+'…':r.cliente}</td>
+      <td class="acc">${r.pedido}</td>
+      <td><span class="chip ${chipCls(r)}">${r.responsable}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:10px;">${r.motivo}</td>
+      <td class="hl">${fmt(r.piezas)}</td>
+      <td class="wrn">${fmt(r.kilos,1)}</td>
+    </tr>`).join('');
+}
+
+// ── TABLA PRODUCCIÓN ──────────────────────────────────────────────────────────
+function renderTablaProduccion({ dActual }) {
+  const sorted = [...dActual].sort((a,b)=>b.dia-a.dia);
+  let acum = sum(dActual,'tonEmb');
+  const rows = [...dActual].sort((a,b)=>a.dia-b.dia);
+  let ac = 0;
+  const acums = rows.map(r=>{ ac+=r.tonEmb; return ac; });
+
+  document.getElementById('tablaProduccion').innerHTML = rows.map((r,i)=>{
+    const isParo = r.tonProd===0;
+    const mermaTotal = (r.mermaTrim||0)+(r.mermaProc||0);
+    const pctM = r.tonProd>0 ? mermaTotal/(r.tonProd*10) : 0;
+    const chip = pctM<=10.5?'chip-ok':pctM<=15?'chip-warn':'chip-bad';
+    return `<tr>
+      <td class="hl">${fmtD(r.fecha)}</td>
+      <td class="${isParo?'':'acc'}">${isParo?'—':fmt(r.tonEmb)}</td>
+      <td>${isParo?'<span style="color:#2a3040">PARO</span>':fmt(r.tonProd)}</td>
+      <td>${isParo?'—':fmt(r.m2,0)}</td>
+      <td>${isParo?'—':fmt(r.mermaTrim,0)}</td>
+      <td>${isParo?'—':fmt(r.mermaProc,0)}</td>
+      <td class="wrn">${isParo?'—':fmt(mermaTotal,0)}</td>
+      <td>${isParo?'—':`<span class="chip ${chip}">${fmt(pctM,1)}%</span>`}</td>
+      <td class="acc">${isParo?'—':fmt(acums[i])}</td>
+      <td style="font-size:9px;color:var(--text-muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;">${r.obs||''}</td>
+    </tr>`;
+  }).reverse().join('');
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  const tabs=['produccion','merma','devoluciones','diario'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',tabs[i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id===`tab-${name}`));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
 loadData();
-// Auto-refresh cada 5 minutos
-setInterval(loadData, 5 * 60 * 1000);
+setInterval(loadData, 5*60*1000);
 </script>
 </body>
 </html>
