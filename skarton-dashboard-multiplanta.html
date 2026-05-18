@@ -23,7 +23,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 #loading{position:fixed;inset:0;background:#111318;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px;}
 .loading-logo{font-family:var(--font-display);font-size:64px;letter-spacing:8px;color:var(--accent);}
 .loading-bar-track{width:320px;height:2px;background:#1e2330;overflow:hidden;}
-.loading-bar{height:100%;background:#0066cc;animation:loadbar 2s ease-in-out forwards;}
+.loading-bar{height:100%;background:#0066cc;animation:loadbar 4s ease-in-out forwards;}
 @keyframes loadbar{from{width:0}to{width:100%}}
 .loading-text{font-family:var(--font-mono);font-size:11px;color:#8892a4;letter-spacing:2px;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
@@ -455,7 +455,10 @@ async function loadData() {
     document.getElementById('filterAnio').value = anioActual;
     document.getElementById('filterMes').value  = mesActual;
 
-    window._loaded = true;
+    if (!window._firstLoaded) {
+      window._firstLoaded = true;
+      await new Promise(r => setTimeout(r, 3000));
+    }
     document.getElementById('loading').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('periodoBanner').style.display = 'flex';
